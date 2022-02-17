@@ -1,0 +1,41 @@
+{
+  "name": "zonal",
+  "version": "0.0.0",
+  "description": "Zonal Statistics",
+  "main": "zonal.js",
+  "scripts": {
+    "build": "npx browserify ./zonal.js > zonal.min.js",
+    "setup": "cd data && ./setup.sh",
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oviohub/zonal.git"
+  },
+  "keywords": [
+    "analysis",
+    "geospatial",
+    "gis",
+    "raster",
+    "zonal"
+  ],
+  "author": "Daniel J. Dufour",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/oviohub/zonal/issues"
+  },
+  "homepage": "https://github.com/oviohub/zonal#readme",
+  "devDependencies": {
+    "@turf/meta": "^6.5.0",
+    "flug": "^2.2.0"
+  },
+  "dependencies": {
+    "@turf/area": "^6.5.0",
+    "@turf/boolean-point-in-polygon": "^6.5.0",
+    "@turf/clone": "^6.5.0",
+    "@turf/difference": "^6.5.0",
+    "@turf/intersect": "^6.5.0",
+    "lodash.sortby": "^4.7.0",
+    "papaparse": "^5.3.1"
+  }
+}
