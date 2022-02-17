@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://unpkg.com/dropzone-complete"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+    <script src="./zonal.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0 auto;
+        max-width: 800px;
+        padding: 15px;
+      }
+
+      table {
+        font-size: 12pt;
+        width: 100%;
+      }
+      th {
+        background: lightskyblue;
+      }
+
+      select {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Zonal Demo</h1>
+    <script>
+      window.state = {
+        zone_properties: [],
+        class_properties: []
+      };
+
+      function getSelectedProperties(id) { 
+        const arr = Array.from(document.querySelectorAll(`#${id} option:checked`)).map(option => option.value);
+        if (arr.length > 0) {
+          return arr;
+        }
+      };
+
+      function getAllProps (geojson) {
+        const seen = new Set();
+        turf.propEach(geojson, properties => {
+          Object.keys(properties).forEach(key => {
+            seen.add(key);
+          });
+        });
+        return seen;
+      }
+
+      function run () {
+        if (state.zones && state.classes) {
+          const { table } = zonal.calculate({
+            zones: state.zones,
+            zone_properties: getSelectedProperties("zone_properties"),
+            classes: state.classes,
+            class_properties: getSelectedProperties("class_properties"),
+            // class_geometry_type,
+            // include_zero_count = false            
+          });
+
+          const columns = Object.keys(table[0]);
+          console.log(columns);
+          // add header
+          const table_element = document.getElementById("results-table");
+          const thead = document.createElement("THEAD");
+          columns.forEach(col => {
+            const th = document.createElement("TH");
+            th.innerText = col;
+            thead.appendChild(th);
+          });
+          table_element.appendChild(thead);
+
+          table.forEach(row => {
+            const tr = document.createElement("TR");
+            columns.map(column => {
+              const td = document.createElement("TD");
+              td.textContent = row[column];
+              tr.appendChild(td);
+            });
+            table_element.appendChild(tr);
+          });
+        }
+      }
+    </script>
+    <h3>Zones</h3>
+    <dropzone-complete id="zones" height="200px" width="100%"></dropzone-complete>
+    <script>
+      document.getElementById("zones").addEventListener("change", async function(event) {
+        if (event?.detail?.file) {
+          const select = document.getElementById("zone_properties");
+
+          state.zones = JSON.parse(await event.detail.file.text());
+
+          select.innerHTML = Array.from(getAllProps(state.zones)).sort().map(k => `<option value="${k}">${k}</option>`).join("\n");
+        }
+      });
+    </script>
+    <h4>Zone Properties</h4>
+    <select id="zone_properties" name="zone_properties" multiple></select>
+
+    <h3>Classes</h3>
+    <dropzone-complete id="classes" height="200px" width="100%"></dropzone-complete>
+    <script>
+      document.getElementById("classes").addEventListener("change", async function(event) {
+        console.log("event:", event);
+        if (event?.detail?.file) {
+          const select = document.getElementById("class_properties");
+
+          state.classes = JSON.parse(await event.detail.file.text());
+
+          select.innerHTML = Array.from(getAllProps(state.classes)).sort().map(k => `<option value="${k}">${k}</option>`).join("\n");
+        }
+      });
+    </script>
+
+    <h4>Class Properties</h4>
+    <select id="class_properties" name="class_properties" multiple></select>
+
+    <button id="execute" style="font-size: 24pt;">Calculate</button>
+    <script>
+      document.getElementById("execute").addEventListener("click", run);
+    </script>
+
+    <div>Results Table</div>
+    <table id="results-table">
+
+    </table>
+  </body>
+</html>

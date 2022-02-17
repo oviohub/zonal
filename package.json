@@ -5,6 +5,7 @@
   "main": "zonal.js",
   "scripts": {
     "build": "npx browserify ./zonal.js > zonal.min.js",
+    "format": "npx prettier --arrow-parens=avoid --trailing-comma=none --write test.js zonal.js",
     "setup": "cd data && ./setup.sh",
     "test": "node test.js"
   },
