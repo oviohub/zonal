@@ -34,7 +34,7 @@ test("polygon zones and point class", ({ eq }) => {
     zones: nam_admin2,
     classes: windhoek 
   });
-  eq(result, { table: [ { "zone:index": 104, "class:index": 0, "stat:count": 1 } ] });
+  eq(result.table, [ { "zone:index": 104, "class:index": 0, "stat:count": 1 } ]);
 });
 
 test("polygon zones, zone properties, point class", ({ eq }) => {
@@ -43,7 +43,7 @@ test("polygon zones, zone properties, point class", ({ eq }) => {
     zone_properties: ["ADM2_EN"],
     classes: windhoek
   });
-  eq(result, { table: [ { "zone:ADM2_EN": "Windhoek East", "class:index": 0, "stat:count": 1 } ] });
+  eq(result.table, [ { "zone:ADM2_EN": "Windhoek East", "class:index": 0, "stat:count": 1 } ]);
 });
 
 test("polygon zones, zone properties, class properties, point class", ({ eq }) => {
@@ -53,7 +53,7 @@ test("polygon zones, zone properties, class properties, point class", ({ eq }) =
     classes: windhoek,
     class_properties: ["name"]
   });
-  eq(result, { table: [ { "zone:ADM2_EN": "Windhoek East", "class:name": "Event", "stat:count": 1 } ] });
+  eq(result.table, [ { "zone:ADM2_EN": "Windhoek East", "class:name": "Event", "stat:count": 1 } ]);
 });
 
 test("1 polygon zone completely inside 1 class", ({ eq }) => {
@@ -93,12 +93,19 @@ test("1 polygon zone partially intersects ", ({ eq }) => {
     class_properties: ["wind_speed"],
     include_zero_area: false
   });
+    
   eq(result.table, [
     {
       'zone:ParishName': 'Caddo',
       'class:wind_speed': '60 km/h',
       'stat:area': 1425010850,
       'stat:percentage': 0.5836591002138494
+    },
+    {
+      'zone:ParishName': 'Caddo',
+      'class:wind_speed': null,
+      'stat:area': 1016501412,
+      'stat:percentage': 0.41634089978615063  
     }
   ]);
 });
@@ -111,7 +118,6 @@ test("1 polygon zone partially intersects (include_zero_area) ", ({ eq }) => {
     class_properties: ["wind_speed"],
     include_zero_area: true
   });
-  console.log("result.table:", result.table);
   eq(result.table, [
     {
       'zone:ParishName': 'Caddo',
@@ -122,8 +128,8 @@ test("1 polygon zone partially intersects (include_zero_area) ", ({ eq }) => {
     {
       'zone:ParishName': 'Caddo',
       'class:wind_speed': null,
-      'stat:area': 123,
-      'stat:percentage': 123
+      'stat:area': 1016501412,
+      'stat:percentage': 0.41634089978615063
     }    
   ]);
 });

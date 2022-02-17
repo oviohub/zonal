@@ -157,45 +157,40 @@ function calculate ({
                 // add to map-based result
                 collection.push(new_feature);
   
-                // // cut feature area out of zone
-                // console.log("diff area (before): ", remaining_zone_geometry ? area(remaining_zone_geometry) : 0);
-                // // diff = difference(diff, new_feature);
-                // remaining_zone_geometry = difference(remaining_zone_geometry, new_feature)
-                // console.log("diff area (after): ", remaining_zone_geometry ? area(remaining_zone_geometry) : 0);
+                remaining_zone_geometry = difference(remaining_zone_geometry, new_feature);
               });
             }
           }
         });
-
-        // if (class_geometry_type === "Polygon") {
-        //   // if (remaining_zone_geometry) 
-        //   // const unclassed = intersect(zone_geometry, diff);
-
-        //   const unclassed_id = JSON.stringify([zone_id, null]);
-
-        //   // make sure unclasses appears in stats
-        //   if (!(unclassed_id in stats)) stats[unclassed_id] = { area: 0 };
-
-        //   if (unclassed) {
-        //     geomEach(unclassed, unclassed_geom => {
-        //       const diff_area = Math.round(area(unclassed_geom));
-
-        //       stats[diff_id].area += diff_area;
-
-        //       // // console.log({zone_id});
-        //       const new_diff_feature = {
-        //         type: "Feature",
-        //         properties: {
-        //           zone_id,
-        //           class_id: null // null for parts of zone not intersecting a class
-        //         },
-        //         geometry: unclassed_geom
-        //       };
-        //       collection.push(new_diff_feature);
-        //     });
-        //   }
-        // }
       });
+
+      // after we've gone through all the classes
+      // see what's left and save the area of the part of the zone
+      // that aren't overlapped by a class
+      if (class_geometry_type === "Polygon") {
+        const zone_without_class_id = JSON.stringify([zone_id, null]);
+
+        if (!(zone_without_class_id in stats)) stats[zone_without_class_id] = { area: 0 };
+
+        if (remaining_zone_geometry) {
+          geomEach(remaining_zone_geometry, remaining_zone_polygon => {
+            const diff_area = Math.round(area(remaining_zone_polygon));
+
+            stats[zone_without_class_id].area += diff_area;
+
+            // console.log({zone_id});
+            const new_feature = {
+              type: "Feature",
+              properties: {
+                zone_id,
+                class_id: null // null for parts of zone not intersecting a class
+              },
+              geometry: remaining_zone_polygon
+            };
+            collection.push(new_feature);
+          });
+        }
+      }
     });
   });
 
@@ -242,7 +237,10 @@ function calculate ({
 
   // console.dir(table, {'maxArrayLength': 5});
 
-  return { table };
+  return {
+    geojson: { type: "FeatureCollection", features: collection },
+    table
+  };
 }
 
 const zonal = { calculate };
