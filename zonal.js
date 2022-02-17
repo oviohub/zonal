@@ -5,18 +5,18 @@ const intersect = require("@turf/intersect").default;
 const booleanPointInPolygon = require("@turf/boolean-point-in-polygon").default;
 const { featureEach, geomEach } = require("@turf/meta");
 
-function getClassGeometryType (geom) {
+function getClassGeometryType(geom) {
   switch (geom.type) {
     case "Polygon":
     case "MultiPolygon":
       return "Polygon";
     case "Point":
     case "MultiPoint":
-      return "Point"
+      return "Point";
   }
 }
 
-function getKey ({ feature, index, geometry, props }) {
+function getKey({ feature, index, geometry, props }) {
   if (props) {
     const key = [];
     props.forEach(prop => {
@@ -35,7 +35,7 @@ function getKey ({ feature, index, geometry, props }) {
 // assumptions
 // - zones is a GeoJSON with polygons
 // - classes are either all polygons/multi-polygons or all points (not mix of polygons and points)
-function calculate ({
+function calculate({
   zones,
   zone_properties,
   classes,
@@ -45,13 +45,16 @@ function calculate ({
   include_zero_area = false
 }) {
   if (!(Array.isArray(zone_properties) && zone_properties.length > 0)) {
-    console.warn("[zonal] you didn't pass in zone_properties, so defaulting to the zonal feature index number");
+    console.warn(
+      "[zonal] you didn't pass in zone_properties, so defaulting to the zonal feature index number"
+    );
   }
 
   if (!(Array.isArray(class_properties) && class_properties.length > 0)) {
-    console.warn("[zonal] you didn't pass in class_properties, so defaulting to the class feature index number");
+    console.warn(
+      "[zonal] you didn't pass in class_properties, so defaulting to the class feature index number"
+    );
   }
-
 
   // collection of features with polygon geometries
   // this will store the map representation of the results
@@ -92,7 +95,6 @@ function calculate ({
       // for vector classes
       // after getting zone, get all intersecting classes
       featureEach(classes, (class_feature, class_feature_index) => {
-
         geomEach(class_feature, (class_geometry, class_geometry_index) => {
           const class_id = getKey({
             feature: class_feature,
@@ -106,11 +108,14 @@ function calculate ({
           const combo_id = JSON.stringify([zone_id, class_id]);
 
           // is the class type points, lines or polygons?
-          if (!class_geometry_type) class_geometry_type = getClassGeometryType(class_geometry);
+          if (!class_geometry_type)
+            class_geometry_type = getClassGeometryType(class_geometry);
 
           // unexpected class geometry change, like a point within a collection of polygons
           if (getClassGeometryType(class_geometry) !== class_geometry_type) {
-            console.warn("[zonal] we encountered an unexpected class geometry, so we're skipping it");
+            console.warn(
+              "[zonal] we encountered an unexpected class geometry, so we're skipping it"
+            );
             return;
           }
 
@@ -133,7 +138,6 @@ function calculate ({
           } else if (class_geometry_type === "Polygon") {
             const intersection = intersect(zone_geometry, class_geometry);
             if (intersection) {
-
               // require("fs").writeFileSync("intersection.geojson", JSON.stringify(intersection), "utf-8");
 
               // just in case intersection is a multi-polygon
@@ -144,7 +148,7 @@ function calculate ({
                 // rounding because area function, because TurfJS area calculation
                 // uses floating-point arithmetic and isn't super precise
                 stats[combo_id].area += Math.round(area(polygon));
-  
+
                 const new_feature = {
                   type: "Feature",
                   properties: {
@@ -153,11 +157,14 @@ function calculate ({
                   },
                   geometry: polygon
                 };
-  
+
                 // add to map-based result
                 collection.push(new_feature);
-  
-                remaining_zone_geometry = difference(remaining_zone_geometry, new_feature);
+
+                remaining_zone_geometry = difference(
+                  remaining_zone_geometry,
+                  new_feature
+                );
               });
             }
           }
@@ -170,7 +177,8 @@ function calculate ({
       if (class_geometry_type === "Polygon") {
         const zone_without_class_id = JSON.stringify([zone_id, null]);
 
-        if (!(zone_without_class_id in stats)) stats[zone_without_class_id] = { area: 0 };
+        if (!(zone_without_class_id in stats))
+          stats[zone_without_class_id] = { area: 0 };
 
         if (remaining_zone_geometry) {
           geomEach(remaining_zone_geometry, remaining_zone_polygon => {
@@ -218,11 +226,13 @@ function calculate ({
       row["zone:" + key] = it;
     });
     (class_id || [null]).map((it, i) => {
-      const key = Array.isArray(class_properties) ? class_properties[i] : "index";
+      const key = Array.isArray(class_properties)
+        ? class_properties[i]
+        : "index";
       row["class:" + key] = it;
     });
     for (let stat_name in combo_stats) {
-      row["stat:" + stat_name] = combo_stats[stat_name]
+      row["stat:" + stat_name] = combo_stats[stat_name];
     }
     table.push(row);
   }
@@ -252,4 +262,3 @@ if (typeof define === "function" && define.amd)
 if (typeof module === "object") module.exports = zonal;
 if (typeof window === "object") window.zonal = zonal;
 if (typeof self === "object") self.zonal = zonal;
-
