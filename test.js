@@ -141,3 +141,13 @@ test("1 polygon zone partially intersects (include_zero_area) ", ({ eq }) => {
     }
   ]);
 });
+
+test("admin boundaries with wind cones", ({ eq }) => {
+  const results = calculate({
+    zones: louisiana_parishes,
+    zone_properties: ["ParishName"],
+    classes: wind_buffers,
+    class_properties: ["wind_speed"]
+  });
+  console.log("results;", results);
+});

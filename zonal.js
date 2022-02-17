@@ -44,6 +44,9 @@ function calculate({
   include_zero_count = false,
   include_zero_area = false
 }) {
+  if (!classes) throw new Error("[zonal] classes are missing or empty");
+  if (!zones) throw new Error("[zonal] zones are missing or empty");
+
   if (!(Array.isArray(zone_properties) && zone_properties.length > 0)) {
     console.warn(
       "[zonal] you didn't pass in zone_properties, so defaulting to the zonal feature index number"
@@ -161,10 +164,12 @@ function calculate({
                 // add to map-based result
                 collection.push(new_feature);
 
-                remaining_zone_geometry = difference(
-                  remaining_zone_geometry,
-                  new_feature
-                );
+                if (remaining_zone_geometry) {
+                  remaining_zone_geometry = difference(
+                    remaining_zone_geometry,
+                    new_feature
+                  );
+                }
               });
             }
           }
