@@ -13,6 +13,7 @@ const wind_buffers = loadJSON(
 const louisiana_parishes = loadJSON("./data/louisiana_parishes.geojson");
 const cone = loadJSON("./data/ida.geojson");
 const caddo = loadJSON("./data/louisiana_parish_caddo.geojson");
+const concordia = loadJSON("./data/louisiana_parish_concordia.geojson");
 const vernon = loadJSON("./data/louisiana_parish_vernon.geojson");
 
 const windhoek = {
@@ -142,12 +143,56 @@ test("1 polygon zone partially intersects (include_zero_area) ", ({ eq }) => {
   ]);
 });
 
+// wind_buffers has intersecting polygons
+// so sometimes percentages don't add up to 1 if overlapping classes
+// percentage is the stat:area / the total area of the zone
+test("1 polygon zone partially intersects multiple overlapping classes", ({
+  eq
+}) => {
+  const result = calculate({
+    zones: concordia,
+    zone_properties: ["ParishName"],
+    classes: wind_buffers,
+    class_properties: ["wind_speed"],
+    include_zero_area: true
+  });
+  eq(result.table, [
+    {
+      "zone:ParishName": "Concordia",
+      "class:wind_speed": "60 km/h",
+      "stat:area": 1947712532,
+      "stat:percentage": 1
+    },
+    {
+      "zone:ParishName": "Concordia",
+      "class:wind_speed": "90 km/h",
+      "stat:area": 32134688,
+      "stat:percentage": 0.01649868113083538
+    },
+    {
+      "zone:ParishName": "Concordia",
+      "class:wind_speed": null,
+      "stat:area": 0,
+      "stat:percentage": 0
+    }
+  ]);
+});
+
 test("admin boundaries with wind cones", ({ eq }) => {
   const results = calculate({
     zones: louisiana_parishes,
     zone_properties: ["ParishName"],
     classes: wind_buffers,
-    class_properties: ["wind_speed"]
+    class_properties: ["wind_speed"],
+    preserve_features: true
   });
-  console.log("results;", results);
+  const feature = results.geojson.features[0];
+  eq(feature.properties, {
+    "zonal:zone_id": ["Acadia"],
+    "zonal:stat:area": 1708349991,
+    "zonal:stat:minority": "60 km/h",
+    "zonal:stat:majority": "60 km/h",
+    "zonal:stat:percentage": 1,
+    "zonal:stat:sum": 1708349991
+  });
 });

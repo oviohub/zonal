@@ -5,6 +5,16 @@ const intersect = require("@turf/intersect").default;
 const booleanPointInPolygon = require("@turf/boolean-point-in-polygon").default;
 const { featureEach, geomEach } = require("@turf/meta");
 
+// replacement for Object.entries in case Object.entries
+// isn't defined
+function entries(object) {
+  const results = [];
+  for (let key in object) {
+    results.push([key, object[key]]);
+  }
+  return results;
+}
+
 function getClassGeometryType(geom) {
   switch (geom.type) {
     case "Polygon":
@@ -42,7 +52,8 @@ function calculate({
   class_properties,
   class_geometry_type,
   include_zero_count = false,
-  include_zero_area = false
+  include_zero_area = false,
+  preserve_features = false
 }) {
   if (!classes) throw new Error("[zonal] classes are missing or empty");
   if (!zones) throw new Error("[zonal] zones are missing or empty");
@@ -83,6 +94,11 @@ function calculate({
         props: zone_properties,
         index: zone_feature_index
       });
+
+      if (preserve_features) {
+        if (!("properties" in zone_feature)) zone_feature.properties = {};
+        zone_feature.properties = { "zonal:zone_id": zone_id };
+      }
 
       // track the total area of the zone across all its features
       if (!(zone_id in zone_to_area)) zone_to_area[zone_id] = 0;
@@ -191,7 +207,6 @@ function calculate({
 
             stats[zone_without_class_id].area += diff_area;
 
-            // console.log({zone_id});
             const new_feature = {
               type: "Feature",
               properties: {
@@ -212,12 +227,9 @@ function calculate({
     const combo_stats = stats[combo_id];
     const [zone_id, class_id] = JSON.parse(combo_id);
     if ("area" in combo_stats) {
-      // console.log("calculating percentage:", [combo_stats.area, zone_to_area[zone_id]]);
       combo_stats.percentage = combo_stats.area / zone_to_area[zone_id];
     }
   }
-
-  // console.log("stats:", stats);
 
   // reformat stats for return
   let table = [];
@@ -250,12 +262,52 @@ function calculate({
     table = table.filter(row => row["stat:area"] !== 0);
   }
 
-  // console.dir(table, {'maxArrayLength': 5});
+  const results = { table };
 
-  return {
-    geojson: { type: "FeatureCollection", features: collection },
-    table
-  };
+  if (preserve_features) {
+    results.geojson = zones;
+
+    // group stats by zone
+    const zone_id_to_stats = {};
+    for (let combo_id in stats) {
+      const combo_stats = stats[combo_id];
+      const [zone_id, class_id] = JSON.parse(combo_id);
+      if (!(zone_id in zone_id_to_stats)) zone_id_to_stats[zone_id] = {};
+      zone_id_to_stats[zone_id][class_id] = combo_stats;
+    }
+
+    // aggregate statistics
+    const agg_stats = {};
+    for (let zone_id in zone_id_to_stats) {
+      const zone_stats = {};
+      const pairs = entries(zone_id_to_stats[zone_id]);
+      const sorted_by_area = pairs
+        .filter(it => it[0] !== "null")
+        .sort((a, b) => a[1].area - b[1].area);
+      zone_stats.minority = sorted_by_area[0][0];
+      zone_stats.majority = sorted_by_area[sorted_by_area.length - 1][0];
+      const zone_area = zone_to_area[zone_id];
+      const unclassed_percentage = pairs.find(pair => pair[0] === "null")[1]
+        .percentage;
+      zone_stats.percentage = 1 - unclassed_percentage;
+      zone_stats.sum = Math.round(zone_stats.percentage * zone_area);
+      agg_stats[zone_id] = zone_stats;
+    }
+
+    featureEach(zones, (zone_feature, zone_feature_index) => {
+      const props = zone_feature.properties;
+      const zone_id = props["zonal:zone_id"];
+      props["zonal:stat:area"] = zone_to_area[zone_id];
+      entries(agg_stats[zone_id]).forEach(([stat_name, stat_value]) => {
+        props["zonal:stat:" + stat_name] = stat_value;
+      });
+    });
+    results.geojson = zones;
+  } else {
+    results.geojson = { type: "FeatureCollection", features: collection };
+  }
+
+  return results;
 }
 
 const zonal = { calculate };
