@@ -51,7 +51,21 @@ result is the following object:
           "zonal:stat:minority": "60 km/h",
           "zonal:stat:majority": "60 km/h",
           "zonal:stat:percentage": 1,
-          "zonal:stat:sum": 1708349991
+          "zonal:stat:sum": 1708349991,
+          
+          // zonal stats for each of the classes that overlap the zone
+          "zonal:stat:classes": {
+            "60 km/h": {
+              area: 1708349991,
+              percentage: 1
+            },
+            
+            // null represents the area of the zone that doesn't intersect classes
+            "null": {
+              area: 0,
+              percentage: 0
+            }
+          }          
         },
         geometry: { /* ... */ }
       },
