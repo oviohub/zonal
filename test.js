@@ -193,6 +193,16 @@ test("admin boundaries with wind cones", ({ eq }) => {
     "zonal:stat:minority": "60 km/h",
     "zonal:stat:majority": "60 km/h",
     "zonal:stat:percentage": 1,
-    "zonal:stat:sum": 1708349991
+    "zonal:stat:sum": 1708349991,
+    "zonal:stat:classes": {
+      "60 km/h": {
+        area: 1708349991,
+        percentage: 1
+      },
+      null: {
+        area: 0,
+        percentage: 0
+      }
+    }
   });
 });
