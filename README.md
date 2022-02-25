@@ -24,9 +24,9 @@ const classes = { "type": "FeatureCollection": [...] };
 
 const results = calculate({
   zones,
-  zone_properties,
+  zone_properties: ["ParishName"],
   classes,
-  class_properties,
+  class_properties: ["wind_speed"],
 
   // modify zones in-place
   // adding aggregate statistics to
