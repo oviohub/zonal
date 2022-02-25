@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/oviohub/zonal#readme",
   "devDependencies": {
+    "@turf/buffer": "^6.5.0",
     "@turf/meta": "^6.5.0",
     "flug": "^2.2.0"
   },
