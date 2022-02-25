@@ -35,7 +35,7 @@ const results = calculate({
   
   // delimiter used when serializing classes
   // with multiple properties to strings
-  class_properties_delimiter = ","
+  class_properties_delimiter: ","
 });
 ```
 result is the following object:
