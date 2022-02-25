@@ -1,5 +1,12 @@
-# zonal
-Zonal Statistics
+# zonal: _beta version_
+> Zonal Statistics
+
+# purpose
+This library calculates the intersections of two different geospatial datasets.
+It helps answer questions like:
+- what districts felt an earthquake?
+- how much area experienced a tropical cyclone?
+ 
 
 # install
 ```bash
@@ -24,7 +31,11 @@ const results = calculate({
   // modify zones in-place
   // adding aggregate statistics to
   // geojson feature properties
-  preserve_features: true
+  preserve_features: true,
+  
+  // delimiter used when serializing classes
+  // with multiple properties to strings
+  class_properties_delimiter = ","
 });
 ```
 result is the following object:
