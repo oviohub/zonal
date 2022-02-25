@@ -79,7 +79,8 @@
             const tr = document.createElement("TR");
             columns.map(column => {
               const td = document.createElement("TD");
-              td.textContent = row[column];
+              const value = row[column];
+              td.textContent = value === null ? "null" : value;
               tr.appendChild(td);
             });
             table_element.appendChild(tr);
