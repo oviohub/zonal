@@ -66,7 +66,7 @@ function calculate({
   include_zero_count = false,
   include_zero_area = false,
   preserve_features = false,
-  class_properties_delimiter = "|"
+  class_properties_delimiter = ","
 }) {
   if (!classes) throw new Error("[zonal] classes are missing or empty");
   if (!zones) throw new Error("[zonal] zones are missing or empty");
