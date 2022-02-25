@@ -106,3 +106,8 @@ dist
 # Other files
 pnpm-lock.yaml
 .DS_Store
+*tmp*
+
+# ignore data files by default
+data/*
+
