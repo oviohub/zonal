@@ -3,6 +3,12 @@
   "version": "0.0.0",
   "description": "Zonal Statistics",
   "main": "zonal.js",
+  "unpkg": "zonal.min.js",
+  "jsdelivr": "zonal.min.js",
+  "files": [
+    "zonal.js",
+    "zonal.min.js"
+  ],
   "scripts": {
     "build": "npx browserify ./zonal.js > zonal.min.js",
     "format": "npx prettier --arrow-parens=avoid --trailing-comma=none --write test.js zonal.js",
