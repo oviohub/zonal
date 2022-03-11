@@ -1,6 +1,6 @@
 const area = require("@turf/area").default;
 const clone = require("@turf/clone").default;
-const difference = require("@turf/difference");
+const difference = require("@turf/difference").default;
 const intersect = require("@turf/intersect").default;
 const booleanPointInPolygon = require("@turf/boolean-point-in-polygon").default;
 const { featureEach, geomEach } = require("@turf/meta");

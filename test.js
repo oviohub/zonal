@@ -12,6 +12,7 @@ const earthquake_bufers = loadJSON("./data/earthquake_buffers.geojson");
 
 const indonesia_admin_boundaries = loadJSON("./data/admin_idn.json");
 
+const mmr_admin1_boundaries = loadJSON("./data/mmr_admin1_boundaries.json");
 const nam_admin2 = loadJSON("./data/nam_admin2.json");
 const wind_buffers = loadJSON(
   "./data/wld_nhr_adamtsbufferscurrent_wfp.geojson"
@@ -21,6 +22,12 @@ const cone = loadJSON("./data/ida.geojson");
 const caddo = loadJSON("./data/louisiana_parish_caddo.geojson");
 const concordia = loadJSON("./data/louisiana_parish_concordia.geojson");
 const vernon = loadJSON("./data/louisiana_parish_vernon.geojson");
+
+// generated from
+// https://geonode.wfp.org/geoserver/wfs?SERVICE=WFS&request=GetFeature&typeNames=mmr_gdacs_buffers&outputFormat=application%2Fjson
+const tropical_storm_wind_buffers = loadJSON(
+  "./data/mmr_gdacs_buffers.geojson"
+);
 
 const windhoek = {
   type: "Feature",
@@ -287,5 +294,14 @@ test("admin boundaries with wind cones", ({ eq }) => {
       "60 km/h": { area: 1708349991, percentage: 1 },
       null: { area: 0, percentage: 0 }
     }
+  });
+});
+
+test("internal difference calls don't throw errors", ({ eq }) => {
+  calculate({
+    zones: mmr_admin1_boundaries,
+    zone_properties: ["ST"],
+    classes: tropical_storm_wind_buffers,
+    preserve_features: true
   });
 });
