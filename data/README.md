@@ -5,6 +5,10 @@ The following is a list of some of the test data included with this repository a
 - Source: https://geonode.wfp.org/layers/geonode%3Awld_nhr_adamtsbufferscurrent_wfp
 - Filename: wld_nhr_adamtsbufferscurrent_wfp.geojson
 
+### Tropical Storm - Wind Buffers (Myanmar)
+- Source: https://geonode.wfp.org/geoserver/wfs?SERVICE=WFS&request=GetFeature&typeNames=mmr_gdacs_buffers&outputFormat=application%2Fjson
+- Filename: mmr_gdacs_buffers.geojson
+
 ### Global Earthquakes Epicenters - Last 14 Days
 - Source: https://geonode.wfp.org/layers/geonode%3Awld_nhrpub_adameqepic14days_wfp
 - Filename: wld_nhrpub_adameqepic14days_wfp.geojson
