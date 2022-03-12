@@ -41,16 +41,19 @@ const results = calculate({
 result is the following object:
 ```js
 {
-  table: [
-    // ...
-    {
-      "zone:ParishName": "Concordia",
-      "class:wind_speed": "90 km/h",
-      "stat:area": 32134688,
-      "stat:percentage": 0.01649868113083538
-    },
-    // ...
-  ],
+  table: {
+    columns: ["zone:ParishName", "class:wind_speed", "stat:area", "stat:percentage"],
+    rows: [
+      // ...
+      {
+        "zone:ParishName": "Concordia",
+        "class:wind_speed": "90 km/h",
+        "stat:area": 32134688,
+        "stat:percentage": 0.01649868113083538
+      },
+      // ...
+    ]
+  },
   geojson: {
     type: "FeatureCollection",
     features: [
