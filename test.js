@@ -54,7 +54,13 @@ test("earthquake buffers", ({ eq }) => {
     class_properties: ["mag"],
     preserve_features: true
   });
-  const jayapura_rows = results.table.filter(
+  eq(results.table.columns, [
+    "zone:A2NAME",
+    "class:mag",
+    "stat:area",
+    "stat:percentage"
+  ]);
+  const jayapura_rows = results.table.rows.filter(
     row => row["zone:A2NAME"] === "JAYAPURA"
   );
 
@@ -113,7 +119,9 @@ test("polygon zones and point class", ({ eq }) => {
     zones: nam_admin2,
     classes: windhoek
   });
-  eq(result.table, [{ "zone:index": 104, "class:index": 0, "stat:count": 1 }]);
+  eq(result.table.rows, [
+    { "zone:index": 104, "class:index": 0, "stat:count": 1 }
+  ]);
 });
 
 test("polygon zones, zone properties, point class", ({ eq }) => {
@@ -122,7 +130,7 @@ test("polygon zones, zone properties, point class", ({ eq }) => {
     zone_properties: ["ADM2_EN"],
     classes: windhoek
   });
-  eq(result.table, [
+  eq(result.table.rows, [
     { "zone:ADM2_EN": "Windhoek East", "class:index": 0, "stat:count": 1 }
   ]);
 });
@@ -136,14 +144,14 @@ test("polygon zones, zone properties, class properties, point class", ({
     classes: windhoek,
     class_properties: ["name"]
   });
-  eq(result.table, [
+  eq(result.table.rows, [
     { "zone:ADM2_EN": "Windhoek East", "class:name": "Event", "stat:count": 1 }
   ]);
 });
 
 test("1 polygon zone completely inside 1 class", ({ eq }) => {
   const result = calculate({ zones: vernon, classes: cone });
-  eq(result.table, [
+  eq(result.table.rows, [
     {
       "zone:index": 0,
       "class:index": 0,
@@ -160,7 +168,7 @@ test("1 polygon zone completely inside 1 class (with properties)", ({ eq }) => {
     classes: cone,
     class_properties: ["wind_speed"]
   });
-  eq(result.table, [
+  eq(result.table.rows, [
     {
       "zone:ParishName": "Vernon",
       "class:wind_speed": "60 km/h",
@@ -179,7 +187,7 @@ test("1 polygon zone partially intersects ", ({ eq }) => {
     include_zero_area: false
   });
 
-  eq(result.table, [
+  eq(result.table.rows, [
     {
       "zone:ParishName": "Caddo",
       "class:wind_speed": "60 km/h",
@@ -203,7 +211,7 @@ test("1 polygon zone partially intersects (include_zero_area) ", ({ eq }) => {
     class_properties: ["wind_speed"],
     include_zero_area: true
   });
-  eq(result.table, [
+  eq(result.table.rows, [
     {
       "zone:ParishName": "Caddo",
       "class:wind_speed": "60 km/h",
@@ -232,7 +240,7 @@ test("1 polygon zone partially intersects multiple overlapping classes", ({
     class_properties: ["wind_speed"],
     include_zero_area: true
   });
-  eq(result.table, [
+  eq(result.table.rows, [
     {
       "zone:ParishName": "Concordia",
       "class:wind_speed": "60 km/h",
