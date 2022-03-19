@@ -14,20 +14,14 @@ const indonesia_admin_boundaries = loadJSON("./data/admin_idn.json");
 
 const mmr_admin1_boundaries = loadJSON("./data/mmr_admin1_boundaries.json");
 const nam_admin2 = loadJSON("./data/nam_admin2.json");
-const wind_buffers = loadJSON(
-  "./data/wld_nhr_adamtsbufferscurrent_wfp.geojson"
-);
+const wind_buffers = loadJSON("./data/wld_nhr_adamtsbufferscurrent_wfp.geojson");
 const louisiana_parishes = loadJSON("./data/louisiana_parishes.geojson");
 const cone = loadJSON("./data/ida.geojson");
 const caddo = loadJSON("./data/louisiana_parish_caddo.geojson");
 const concordia = loadJSON("./data/louisiana_parish_concordia.geojson");
 const vernon = loadJSON("./data/louisiana_parish_vernon.geojson");
 
-// generated from
-// https://geonode.wfp.org/geoserver/wfs?SERVICE=WFS&request=GetFeature&typeNames=mmr_gdacs_buffers&outputFormat=application%2Fjson
-const tropical_storm_wind_buffers = loadJSON(
-  "./data/mmr_gdacs_buffers.geojson"
-);
+const tropical_storm_wind_buffers = loadJSON("./data/mmr_gdacs_buffers.geojson");
 
 const windhoek = {
   type: "Feature",
@@ -54,30 +48,23 @@ test("earthquake buffers", ({ eq }) => {
     class_properties: ["mag"],
     preserve_features: true
   });
-  eq(results.table.columns, [
-    "zone:A2NAME",
-    "class:mag",
-    "stat:area",
-    "stat:percentage"
-  ]);
-  const jayapura_rows = results.table.rows.filter(
-    row => row["zone:A2NAME"] === "JAYAPURA"
-  );
+  eq(results.table.columns, ["zone:A2NAME", "class:mag", "stat:area", "stat:percentage"]);
+  const jayapura_rows = results.table.rows.filter(row => row["zone:A2NAME"] === "JAYAPURA");
 
   // there are 2 buffers close to each other
   // with 5 mag and 5.5 mag
   eq(jayapura_rows, [
     {
       "zone:A2NAME": "JAYAPURA",
-      "class:mag": 5.5,
-      "stat:area": 10108102039,
-      "stat:percentage": 0.6996874816842877
+      "class:mag": 5,
+      "stat:area": 9000877101,
+      "stat:percentage": 0.6230448611865722
     },
     {
       "zone:A2NAME": "JAYAPURA",
-      "class:mag": 5,
-      "stat:area": 9000877103,
-      "stat:percentage": 0.623044861325013
+      "class:mag": 5.5,
+      "stat:area": 10108102036,
+      "stat:percentage": 0.6996874814766263
     },
     {
       "zone:A2NAME": "JAYAPURA",
@@ -87,9 +74,7 @@ test("earthquake buffers", ({ eq }) => {
     }
   ]);
 
-  const jayapura_props = results.geojson.features.find(
-    f => f.properties["A2NAME"] === "JAYAPURA"
-  ).properties;
+  const jayapura_props = results.geojson.features.find(f => f.properties["A2NAME"] === "JAYAPURA").properties;
   eq(jayapura_props["zonal:stat:minority"], 5);
   eq(jayapura_props["zonal:stat:majority"], 5.5);
   eq(jayapura_props, {
@@ -107,8 +92,8 @@ test("earthquake buffers", ({ eq }) => {
     "zonal:stat:percentage": 0.6996874814766263,
     "zonal:stat:sum": 10108102036,
     "zonal:stat:classes": {
-      5: { area: 9000877103, percentage: 0.623044861325013 },
-      5.5: { area: 10108102039, percentage: 0.6996874816842877 },
+      5: { area: 9000877101, percentage: 0.6230448611865722 },
+      5.5: { area: 10108102036, percentage: 0.6996874814766263 },
       null: { area: 4338493485, percentage: 0.3003125185233737 }
     }
   });
@@ -119,9 +104,7 @@ test("polygon zones and point class", ({ eq }) => {
     zones: nam_admin2,
     classes: windhoek
   });
-  eq(result.table.rows, [
-    { "zone:index": 104, "class:index": 0, "stat:count": 1 }
-  ]);
+  eq(result.table.rows, [{ "zone:index": 104, "class:index": 0, "stat:count": 1 }]);
 });
 
 test("polygon zones, zone properties, point class", ({ eq }) => {
@@ -130,23 +113,17 @@ test("polygon zones, zone properties, point class", ({ eq }) => {
     zone_properties: ["ADM2_EN"],
     classes: windhoek
   });
-  eq(result.table.rows, [
-    { "zone:ADM2_EN": "Windhoek East", "class:index": 0, "stat:count": 1 }
-  ]);
+  eq(result.table.rows, [{ "zone:ADM2_EN": "Windhoek East", "class:index": 0, "stat:count": 1 }]);
 });
 
-test("polygon zones, zone properties, class properties, point class", ({
-  eq
-}) => {
+test("polygon zones, zone properties, class properties, point class", ({ eq }) => {
   const result = calculate({
     zones: nam_admin2,
     zone_properties: ["ADM2_EN"],
     classes: windhoek,
     class_properties: ["name"]
   });
-  eq(result.table.rows, [
-    { "zone:ADM2_EN": "Windhoek East", "class:name": "Event", "stat:count": 1 }
-  ]);
+  eq(result.table.rows, [{ "zone:ADM2_EN": "Windhoek East", "class:name": "Event", "stat:count": 1 }]);
 });
 
 test("1 polygon zone completely inside 1 class", ({ eq }) => {
@@ -220,6 +197,12 @@ test("1 polygon zone partially intersects (include_zero_area) ", ({ eq }) => {
     },
     {
       "zone:ParishName": "Caddo",
+      "class:wind_speed": "Uncertainty Cones",
+      "stat:area": 0,
+      "stat:percentage": 0
+    },
+    {
+      "zone:ParishName": "Caddo",
       "class:wind_speed": null,
       "stat:area": 1016501412,
       "stat:percentage": 0.41634089978615063
@@ -230,9 +213,7 @@ test("1 polygon zone partially intersects (include_zero_area) ", ({ eq }) => {
 // wind_buffers has intersecting polygons
 // so sometimes percentages don't add up to 1 if overlapping classes
 // percentage is the stat:area / the total area of the zone
-test("1 polygon zone partially intersects multiple overlapping classes", ({
-  eq
-}) => {
+test("1 polygon zone partially intersects multiple overlapping classes", ({ eq }) => {
   const result = calculate({
     zones: concordia,
     zone_properties: ["ParishName"],
@@ -241,6 +222,12 @@ test("1 polygon zone partially intersects multiple overlapping classes", ({
     include_zero_area: true
   });
   eq(result.table.rows, [
+    {
+      "zone:ParishName": "Concordia",
+      "class:wind_speed": "120 km/h",
+      "stat:area": 0,
+      "stat:percentage": 0
+    },
     {
       "zone:ParishName": "Concordia",
       "class:wind_speed": "60 km/h",
@@ -252,6 +239,12 @@ test("1 polygon zone partially intersects multiple overlapping classes", ({
       "class:wind_speed": "90 km/h",
       "stat:area": 32134688,
       "stat:percentage": 0.01649868113083538
+    },
+    {
+      "zone:ParishName": "Concordia",
+      "class:wind_speed": "Uncertainty Cones",
+      "stat:area": 0,
+      "stat:percentage": 0
     },
     {
       "zone:ParishName": "Concordia",
@@ -299,8 +292,7 @@ test("admin boundaries with wind cones", ({ eq }) => {
     "zonal:stat:percentage": 1,
     "zonal:stat:sum": 1708349991,
     "zonal:stat:classes": {
-      "60 km/h": { area: 1708349991, percentage: 1 },
-      null: { area: 0, percentage: 0 }
+      "60 km/h": { area: 1708349991, percentage: 1 }
     }
   });
 });
@@ -311,5 +303,26 @@ test("internal difference calls don't throw errors", ({ eq }) => {
     zone_properties: ["ST"],
     classes: tropical_storm_wind_buffers,
     preserve_features: true
+  });
+});
+
+test("percentage within range when using class property", ({ eq }) => {
+  const result = calculate({
+    zones: mmr_admin1_boundaries,
+    zone_properties: ["ST"],
+    classes: tropical_storm_wind_buffers,
+    class_properties: ["label"],
+    preserve_features: true
+  });
+
+  result.table.rows.forEach(row => {
+    if (row["stat:percentage"] < 0) {
+      console.log("row:", row);
+      throw new Error("uh oh stat:percentage is less than zero");
+    }
+    if (row["stat:percentage"] > 1) {
+      console.log("row:", row);
+      throw new Error("uh oh stat:percentage is greater than one");
+    }
   });
 });
