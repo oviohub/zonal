@@ -10,7 +10,7 @@
     "zonal.min.js"
   ],
   "scripts": {
-    "build": "npx browserify ./zonal.js > zonal.min.js",
+    "build": "./node_modules/.bin/babel zonal.js | npx browserify - > zonal.min.js",
     "format": "npx prettier --arrow-parens=avoid --print-width=120 --trailing-comma=none --write test.js zonal.js",
     "setup": "cd data && ./setup.sh",
     "test": "node test.js"
@@ -33,6 +33,9 @@
   },
   "homepage": "https://github.com/oviohub/zonal#readme",
   "devDependencies": {
+    "@babel/cli": "^7.17.6",
+    "@babel/core": "^7.17.8",
+    "@babel/preset-env": "^7.16.11",
     "@turf/buffer": "^6.5.0",
     "@turf/meta": "^6.5.0",
     "flug": "^2.2.0"
