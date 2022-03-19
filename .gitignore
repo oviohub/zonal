@@ -107,6 +107,7 @@ dist
 pnpm-lock.yaml
 .DS_Store
 *tmp*
+*bak*
 
 # ignore data files by default
 data/*
