@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "build": "npx browserify ./zonal.js > zonal.min.js",
-    "format": "npx prettier --arrow-parens=avoid --trailing-comma=none --write test.js zonal.js",
+    "format": "npx prettier --arrow-parens=avoid --print-width=120 --trailing-comma=none --write test.js zonal.js",
     "setup": "cd data && ./setup.sh",
     "test": "node test.js"
   },
@@ -42,8 +42,6 @@
     "@turf/boolean-point-in-polygon": "^6.5.0",
     "@turf/clone": "^6.5.0",
     "@turf/difference": "^6.5.0",
-    "@turf/intersect": "^6.5.0",
-    "lodash.sortby": "^4.7.0",
     "papaparse": "^5.3.1"
   }
 }
