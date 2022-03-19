@@ -63,21 +63,19 @@
             // include_zero_count = false            
           });
 
-          const columns = Object.keys(table[0]);
-          console.log(columns);
           // add header
           const table_element = document.getElementById("results-table");
           const thead = document.createElement("THEAD");
-          columns.forEach(col => {
+          table.columns.forEach(col => {
             const th = document.createElement("TH");
             th.innerText = col;
             thead.appendChild(th);
           });
           table_element.appendChild(thead);
 
-          table.forEach(row => {
+          table.rows.forEach(row => {
             const tr = document.createElement("TR");
-            columns.map(column => {
+            table.columns.map(column => {
               const td = document.createElement("TD");
               const value = row[column];
               td.textContent = value === null ? "null" : value;
