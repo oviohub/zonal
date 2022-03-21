@@ -11,7 +11,7 @@
     "zonal.min.js"
   ],
   "scripts": {
-    "babel": "./node_modules/.bin/babel index.js zonal.js",
+    "babel": "./node_modules/.bin/babel index.js > zonal.js",
     "browserify": "npx browserify zonal.js > zonal.min.js",
     "build": "npm run babel && npm run browserify",
     "format": "npx prettier --arrow-parens=avoid --print-width=120 --trailing-comma=none --write test.js zonal.js",

@@ -174,8 +174,6 @@ function calculate({
             const xy = class_geometry.coordinates;
             const inside = booleanPointInPolygon(xy, zone_geometry);
             if (inside) {
-              any_contained = true;
-
               // increase number of times the combo is found
               stats[combo_id].count++;
             }

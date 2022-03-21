@@ -2,7 +2,7 @@ const fs = require("fs");
 const papaparse = require("papaparse");
 const test = require("flug");
 
-const { calculate } = require("./zonal.js");
+const { calculate } = require(process.env.ZONAL_TEST_PATH || "./index.js");
 
 const loadJSON = fp => JSON.parse(fs.readFileSync(fp, "utf-8"));
 
