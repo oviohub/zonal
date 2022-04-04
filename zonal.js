@@ -1,18 +1,79 @@
 "use strict";
 
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _typeof(obj) {
+  "@babel/helpers - typeof";
+  return (
+    (_typeof =
+      "function" == typeof Symbol && "symbol" == typeof Symbol.iterator
+        ? function (obj) {
+            return typeof obj;
+          }
+        : function (obj) {
+            return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype
+              ? "symbol"
+              : typeof obj;
+          }),
+    _typeof(obj)
+  );
+}
 
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _slicedToArray(arr, i) {
+  return (
+    _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest()
+  );
+}
 
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _nonIterableRest() {
+  throw new TypeError(
+    "Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."
+  );
+}
 
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(o);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
 
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+  for (var i = 0, arr2 = new Array(len); i < len; i++) {
+    arr2[i] = arr[i];
+  }
+  return arr2;
+}
 
-function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function _iterableToArrayLimit(arr, i) {
+  var _i = arr == null ? null : (typeof Symbol !== "undefined" && arr[Symbol.iterator]) || arr["@@iterator"];
+  if (_i == null) return;
+  var _arr = [];
+  var _n = true;
+  var _d = false;
+  var _s, _e;
+  try {
+    for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) {
+      _arr.push(_s.value);
+      if (i && _arr.length === i) break;
+    }
+  } catch (err) {
+    _d = true;
+    _e = err;
+  } finally {
+    try {
+      if (!_n && _i["return"] != null) _i["return"]();
+    } finally {
+      if (_d) throw _e;
+    }
+  }
+  return _arr;
+}
 
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function _arrayWithHoles(arr) {
+  if (Array.isArray(arr)) return arr;
+}
 
 var calculateArea = require("@turf/area")["default"];
 
@@ -23,10 +84,9 @@ var difference = require("@turf/difference")["default"];
 var booleanPointInPolygon = require("@turf/boolean-point-in-polygon")["default"];
 
 var _require = require("@turf/meta"),
-    featureEach = _require.featureEach,
-    geomEach = _require.geomEach; // replacement for Object.entries in case Object.entries
+  featureEach = _require.featureEach,
+  geomEach = _require.geomEach; // replacement for Object.entries in case Object.entries
 // isn't defined
-
 
 function entries(object) {
   var results = [];
@@ -62,9 +122,9 @@ function getClassGeometryType(geom) {
 
 function getArrayKey(_ref) {
   var feature = _ref.feature,
-      index = _ref.index,
-      geometry = _ref.geometry,
-      props = _ref.props;
+    index = _ref.index,
+    geometry = _ref.geometry,
+    props = _ref.props;
 
   if (props) {
     var key = [];
@@ -72,10 +132,12 @@ function getArrayKey(_ref) {
       if (typeof prop === "string") {
         key.push(feature.properties[prop]);
       } else if (typeof prop === "function") {
-        key.push(prop({
-          feature: feature,
-          geometry: geometry
-        }));
+        key.push(
+          prop({
+            feature: feature,
+            geometry: geometry
+          })
+        );
       }
     });
     return key;
@@ -90,25 +152,24 @@ function unarray(arr) {
 // - zones is a GeoJSON with polygons
 // - classes are either all polygons/multi-polygons or all points (not mix of polygons and points)
 
-
 function calculate(_ref2) {
   var zones = _ref2.zones,
-      zone_properties = _ref2.zone_properties,
-      classes = _ref2.classes,
-      class_properties = _ref2.class_properties,
-      class_geometry_type = _ref2.class_geometry_type,
-      _ref2$include_zero_co = _ref2.include_zero_count,
-      include_zero_count = _ref2$include_zero_co === void 0 ? false : _ref2$include_zero_co,
-      _ref2$include_zero_ar = _ref2.include_zero_area,
-      include_zero_area = _ref2$include_zero_ar === void 0 ? false : _ref2$include_zero_ar,
-      _ref2$class_propertie = _ref2.class_properties_delimiter,
-      class_properties_delimiter = _ref2$class_propertie === void 0 ? "," : _ref2$class_propertie,
-      _ref2$preserve_featur = _ref2.preserve_features,
-      preserve_features = _ref2$preserve_featur === void 0 ? true : _ref2$preserve_featur,
-      _ref2$remove_features = _ref2.remove_features_with_no_overlap,
-      remove_features_with_no_overlap = _ref2$remove_features === void 0 ? false : _ref2$remove_features,
-      _ref2$debug_level = _ref2.debug_level,
-      debug_level = _ref2$debug_level === void 0 ? 0 : _ref2$debug_level;
+    zone_properties = _ref2.zone_properties,
+    classes = _ref2.classes,
+    class_properties = _ref2.class_properties,
+    class_geometry_type = _ref2.class_geometry_type,
+    _ref2$include_zero_co = _ref2.include_zero_count,
+    include_zero_count = _ref2$include_zero_co === void 0 ? false : _ref2$include_zero_co,
+    _ref2$include_zero_ar = _ref2.include_zero_area,
+    include_zero_area = _ref2$include_zero_ar === void 0 ? false : _ref2$include_zero_ar,
+    _ref2$class_propertie = _ref2.class_properties_delimiter,
+    class_properties_delimiter = _ref2$class_propertie === void 0 ? "," : _ref2$class_propertie,
+    _ref2$preserve_featur = _ref2.preserve_features,
+    preserve_features = _ref2$preserve_featur === void 0 ? true : _ref2$preserve_featur,
+    _ref2$remove_features = _ref2.remove_features_with_no_overlap,
+    remove_features_with_no_overlap = _ref2$remove_features === void 0 ? false : _ref2$remove_features,
+    _ref2$debug_level = _ref2.debug_level,
+    debug_level = _ref2$debug_level === void 0 ? 0 : _ref2$debug_level;
   if (!classes) throw new Error("[zonal] classes are missing or empty");
   if (!zones) throw new Error("[zonal] zones are missing or empty");
 
@@ -142,7 +203,6 @@ function calculate(_ref2) {
   // e.g. { '["AK","Hot"]': 10, '["AK","Cold"]': 342 }
   // e.g. { [combo_id]: { area: <Number> }}
 
-
   var stats = {}; // { [zone_id]: <total_area_of_zone_in_square_meters> }
 
   var zone_to_area = {}; // { [class_id]: [<array of polygons or points>] }
@@ -169,7 +229,9 @@ function calculate(_ref2) {
         return;
       }
 
-      (_class_to_geometries$ = class_to_geometries[class_id]) !== null && _class_to_geometries$ !== void 0 ? _class_to_geometries$ : class_to_geometries[class_id] = [];
+      (_class_to_geometries$ = class_to_geometries[class_id]) !== null && _class_to_geometries$ !== void 0
+        ? _class_to_geometries$
+        : (class_to_geometries[class_id] = []);
       class_to_geometries[class_id].push(class_geometry);
     });
   }); // zones must be one or more features with polygon geometries
@@ -188,10 +250,14 @@ function calculate(_ref2) {
         index: zone_feature_index
       });
       var zone_id = JSON.stringify(zone_array);
-      (_zone_feature$propert = zone_feature.properties) !== null && _zone_feature$propert !== void 0 ? _zone_feature$propert : zone_feature.properties = {};
+      (_zone_feature$propert = zone_feature.properties) !== null && _zone_feature$propert !== void 0
+        ? _zone_feature$propert
+        : (zone_feature.properties = {});
       zone_feature.properties["zonal:zone_id"] = zone_array; // track the total area of the zone across all its features
 
-      (_zone_to_area$zone_id = zone_to_area[zone_id]) !== null && _zone_to_area$zone_id !== void 0 ? _zone_to_area$zone_id : zone_to_area[zone_id] = 0;
+      (_zone_to_area$zone_id = zone_to_area[zone_id]) !== null && _zone_to_area$zone_id !== void 0
+        ? _zone_to_area$zone_id
+        : (zone_to_area[zone_id] = 0);
       var zone_geometry_area = calculateArea(zone_geometry);
       zone_to_area[zone_id] += zone_geometry_area; // this is the remaining polygonal area of the zone
       // after you have subtracted the overlap with classes
@@ -202,8 +268,8 @@ function calculate(_ref2) {
       var remaining_zone_geometry_for_all_classes = zone_geometry;
       entries(class_to_geometries).forEach(function (_ref3) {
         var _ref4 = _slicedToArray(_ref3, 2),
-            class_id = _ref4[0],
-            class_geometries = _ref4[1];
+          class_id = _ref4[0],
+          class_geometries = _ref4[1];
 
         // unique identifier for the zone + class combo
         // there will be a row in the table for each zone + class combo
@@ -213,9 +279,11 @@ function calculate(_ref2) {
           if (class_geometry_type === "Point") {
             var _stats$combo_id;
 
-            (_stats$combo_id = stats[combo_id]) !== null && _stats$combo_id !== void 0 ? _stats$combo_id : stats[combo_id] = {
-              count: 0
-            };
+            (_stats$combo_id = stats[combo_id]) !== null && _stats$combo_id !== void 0
+              ? _stats$combo_id
+              : (stats[combo_id] = {
+                  count: 0
+                });
             var xy = class_geometry.coordinates;
             var inside = booleanPointInPolygon(xy, zone_geometry);
 
@@ -225,11 +293,17 @@ function calculate(_ref2) {
             }
           } else if (class_geometry_type === "Polygon") {
             if (remaining_zone_geometry_for_all_classes) {
-              remaining_zone_geometry_for_all_classes = difference(remaining_zone_geometry_for_all_classes, class_geometry);
+              remaining_zone_geometry_for_all_classes = difference(
+                remaining_zone_geometry_for_all_classes,
+                class_geometry
+              );
             }
 
             if (remaining_zone_geometry_for_specific_class) {
-              remaining_zone_geometry_for_specific_class = difference(remaining_zone_geometry_for_specific_class, class_geometry);
+              remaining_zone_geometry_for_specific_class = difference(
+                remaining_zone_geometry_for_specific_class,
+                class_geometry
+              );
             }
           }
         });
@@ -237,10 +311,14 @@ function calculate(_ref2) {
         if (class_geometry_type === "Polygon") {
           var _stats$combo_id2;
 
-          (_stats$combo_id2 = stats[combo_id]) !== null && _stats$combo_id2 !== void 0 ? _stats$combo_id2 : stats[combo_id] = {
-            area: 0
-          };
-          var remaining_area = remaining_zone_geometry_for_specific_class ? calculateArea(remaining_zone_geometry_for_specific_class) : 0; // there's no way you can have more remaining than the actual size of the zone
+          (_stats$combo_id2 = stats[combo_id]) !== null && _stats$combo_id2 !== void 0
+            ? _stats$combo_id2
+            : (stats[combo_id] = {
+                area: 0
+              });
+          var remaining_area = remaining_zone_geometry_for_specific_class
+            ? calculateArea(remaining_zone_geometry_for_specific_class)
+            : 0; // there's no way you can have more remaining than the actual size of the zone
           // this happens because of floating point arithmetic issues
 
           if (remaining_area > zone_geometry_area) remaining_area = zone_geometry_area; // area where zone geometry and class overlap
@@ -255,23 +333,27 @@ function calculate(_ref2) {
         var _stats$zone_without_c;
 
         var zone_without_class_id = JSON.stringify([zone_id, null]);
-        (_stats$zone_without_c = stats[zone_without_class_id]) !== null && _stats$zone_without_c !== void 0 ? _stats$zone_without_c : stats[zone_without_class_id] = {
-          area: 0
-        };
-        stats[zone_without_class_id].area += remaining_zone_geometry_for_all_classes ? Math.round(calculateArea(remaining_zone_geometry_for_all_classes)) : 0;
+        (_stats$zone_without_c = stats[zone_without_class_id]) !== null && _stats$zone_without_c !== void 0
+          ? _stats$zone_without_c
+          : (stats[zone_without_class_id] = {
+              area: 0
+            });
+        stats[zone_without_class_id].area += remaining_zone_geometry_for_all_classes
+          ? Math.round(calculateArea(remaining_zone_geometry_for_all_classes))
+          : 0;
       }
     });
   }); // calculate percentages
 
   entries(stats).forEach(function (_ref5) {
     var _ref6 = _slicedToArray(_ref5, 2),
-        combo_id = _ref6[0],
-        combo_stats = _ref6[1];
+      combo_id = _ref6[0],
+      combo_stats = _ref6[1];
 
     var _JSON$parse = JSON.parse(combo_id),
-        _JSON$parse2 = _slicedToArray(_JSON$parse, 2),
-        zone_id = _JSON$parse2[0],
-        class_id = _JSON$parse2[1];
+      _JSON$parse2 = _slicedToArray(_JSON$parse, 2),
+      zone_id = _JSON$parse2[0],
+      class_id = _JSON$parse2[1];
 
     if ("area" in combo_stats) {
       combo_stats.percentage = combo_stats.area / Math.round(zone_to_area[zone_id]);
@@ -286,10 +368,9 @@ function calculate(_ref2) {
     var combo_stats = stats[combo_id];
 
     var _JSON$parse5 = JSON.parse(combo_id),
-        _JSON$parse6 = _slicedToArray(_JSON$parse5, 2),
-        zone_id = _JSON$parse6[0],
-        class_id = _JSON$parse6[1]; // convert zone_id from string to array
-
+      _JSON$parse6 = _slicedToArray(_JSON$parse5, 2),
+      zone_id = _JSON$parse6[0],
+      class_id = _JSON$parse6[1]; // convert zone_id from string to array
 
     zone_id = JSON.parse(zone_id); // convert class id from string to array
 
@@ -334,14 +415,15 @@ function calculate(_ref2) {
     });
   } // sort rows by columns from left to right
 
-
   rows.sort(function (a, b) {
     for (var c = 0; c < columns.length; c++) {
       var col = columns[c];
       var aval = a[col];
       var bval = b[col];
-      if (aval === null && bval !== null) return 1;else if (aval !== null && bval === null) return -1;
-      if (a[col] > b[col]) return 1;else if (a[col] < b[col]) return -1;
+      if (aval === null && bval !== null) return 1;
+      else if (aval !== null && bval === null) return -1;
+      if (a[col] > b[col]) return 1;
+      else if (a[col] < b[col]) return -1;
     }
 
     return 0;
@@ -362,28 +444,31 @@ function calculate(_ref2) {
     var combo_stats = stats[_combo_id];
 
     var _JSON$parse3 = JSON.parse(_combo_id),
-        _JSON$parse4 = _slicedToArray(_JSON$parse3, 2),
-        zone_id = _JSON$parse4[0],
-        class_id = _JSON$parse4[1];
+      _JSON$parse4 = _slicedToArray(_JSON$parse3, 2),
+      zone_id = _JSON$parse4[0],
+      class_id = _JSON$parse4[1];
 
-    (_zone_id_to_stats$zon = zone_id_to_stats[zone_id]) !== null && _zone_id_to_stats$zon !== void 0 ? _zone_id_to_stats$zon : zone_id_to_stats[zone_id] = {};
+    (_zone_id_to_stats$zon = zone_id_to_stats[zone_id]) !== null && _zone_id_to_stats$zon !== void 0
+      ? _zone_id_to_stats$zon
+      : (zone_id_to_stats[zone_id] = {});
     zone_id_to_stats[zone_id][class_id] = combo_stats;
   } // aggregate statistics
-
 
   var agg_stats = {};
 
   for (var _zone_id in zone_id_to_stats) {
     var zone_stats = {};
     var pairs = entries(zone_id_to_stats[_zone_id]);
-    var sorted_by_area = pairs.filter(function (it) {
-      return !["null", '["null"]'].includes(it[0]);
-    }).filter(function (it) {
-      return it[1].area !== 0;
-    }) // filter out zone-class combinations that don't exist
-    .sort(function (a, b) {
-      return a[1].area - b[1].area;
-    });
+    var sorted_by_area = pairs
+      .filter(function (it) {
+        return !["null", '["null"]'].includes(it[0]);
+      })
+      .filter(function (it) {
+        return it[1].area !== 0;
+      }) // filter out zone-class combinations that don't exist
+      .sort(function (a, b) {
+        return a[1].area - b[1].area;
+      });
 
     if (sorted_by_area.length > 0) {
       zone_stats.minority = unarray(JSON.parse(sorted_by_area[0][0]));
@@ -410,15 +495,15 @@ function calculate(_ref2) {
     props["zonal:stat:area"] = Math.round(zone_to_area[zone_id]);
     entries(agg_stats[zone_id]).forEach(function (_ref7) {
       var _ref8 = _slicedToArray(_ref7, 2),
-          stat_name = _ref8[0],
-          stat_value = _ref8[1];
+        stat_name = _ref8[0],
+        stat_value = _ref8[1];
 
       props["zonal:stat:" + stat_name] = stat_value;
     });
     props["zonal:stat:classes"] = entries(zone_id_to_stats[zone_id]).reduce(function (acc, _ref9) {
       var _ref10 = _slicedToArray(_ref9, 2),
-          key = _ref10[0],
-          stats = _ref10[1];
+        key = _ref10[0],
+        stats = _ref10[1];
 
       key = JSON.parse(key);
       key = Array.isArray(key) ? key.join(class_properties_delimiter) : key;
@@ -454,10 +539,10 @@ function calculate(_ref2) {
 var zonal = {
   calculate: calculate
 };
-if (typeof define === "function" && define.amd) define(function () {
-  return zonal;
-});
+if (typeof define === "function" && define.amd)
+  define(function () {
+    return zonal;
+  });
 if ((typeof module === "undefined" ? "undefined" : _typeof(module)) === "object") module.exports = zonal;
 if ((typeof window === "undefined" ? "undefined" : _typeof(window)) === "object") window.zonal = zonal;
 if ((typeof self === "undefined" ? "undefined" : _typeof(self)) === "object") self.zonal = zonal;
-

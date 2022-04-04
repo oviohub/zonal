@@ -64,6 +64,7 @@ function calculate({
   class_geometry_type,
   include_zero_count = false,
   include_zero_area = false,
+  include_null_class_rows = true,
   class_properties_delimiter = ",",
   preserve_features = true,
   remove_features_with_no_overlap = false,
@@ -248,6 +249,10 @@ function calculate({
 
     // convert class id from string to array
     class_id = JSON.parse(class_id);
+
+    if (include_null_class_rows === false && class_id === null) {
+      continue;
+    }
 
     const row = {};
     zone_id.map((it, i) => {

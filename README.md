@@ -41,7 +41,12 @@ const results = calculate({
   // deletes zonal features that have no overlap with the classes
   // examples include districts not covered by a hurricane
   // or cities that can't feel an earthquake
-  remove_features_with_no_overlap: true
+  remove_features_with_no_overlap: true,
+
+  // default is true
+  // set to false to filter out table rows for
+  // parts of zones that don't intersect a class
+  include_null_class_rows: true
 });
 ```
 result is the following object:

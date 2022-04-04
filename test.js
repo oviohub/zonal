@@ -328,16 +328,23 @@ test("percentage within range when using class property", ({ eq }) => {
   });
 });
 
-test("delete zone features that don't overlap classes", ({ eq }) => {
+test("ignore parts of zones that don't overlap classes", ({ eq }) => {
   const result = calculate({
     zones: louisiana_parishes,
     zone_properties: ["ParishName"],
     classes: cone_120km,
     class_properties: ["wind_speed"],
     preserve_features: false,
-    remove_features_with_no_overlap: true
+    remove_features_with_no_overlap: true,
+    include_null_class_rows: false
   });
   eq(louisiana_parishes.features.length > result.geojson.features.length, true);
   eq(louisiana_parishes.features.length, 64);
   eq(result.geojson.features.length, 22);
+  eq(result.table.columns, ["zone:ParishName", "class:wind_speed", "stat:area", "stat:percentage"]);
+  eq(result.table.rows.length, 22);
+  eq(
+    result.table.rows.every(row => row["stat:area"] > 0),
+    true
+  );
 });
