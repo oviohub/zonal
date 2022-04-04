@@ -66,6 +66,7 @@ function calculate({
   include_zero_area = false,
   class_properties_delimiter = ",",
   preserve_features = true,
+  remove_features_with_no_overlap = false,
   debug_level = 0
 }) {
   if (!classes) throw new Error("[zonal] classes are missing or empty");
@@ -85,6 +86,10 @@ function calculate({
     throw new Error("[zonal] class_properties is a string.  it should be an array.");
   }
 
+  if (preserve_features && remove_features_with_no_overlap) {
+    throw new Error("[zonal] you can't preserve features while also removing features that don't overlap classes")
+  }
+
   if ([undefined, null].includes(zone_properties)) {
     console.warn("[zonal] you didn't pass in zone_properties, so defaulting to the zonal feature index number");
   }
@@ -92,6 +97,7 @@ function calculate({
   if ([undefined, null].includes(class_properties)) {
     console.warn("[zonal] you didn't pass in class_properties, so defaulting to the class feature index number");
   }
+  
 
   // stats keyed by the unique zone+class combo id
   // e.g. { '["AK","Hot"]': 10, '["AK","Cold"]': 342 }
@@ -329,6 +335,7 @@ function calculate({
 
   if (!preserve_features) zones = clone(zones);
 
+  const delete_these_features = [];
   featureEach(zones, (zone_feature, zone_feature_index) => {
     const props = zone_feature.properties;
     const zone_id = JSON.stringify(props["zonal:zone_id"]);
@@ -342,7 +349,25 @@ function calculate({
       if (stats.area > 0) acc[key] = stats;
       return acc;
     }, {});
+
+    if (remove_features_with_no_overlap) {
+      const class_keys = Object.keys(props["zonal:stat:classes"]);
+      if (class_keys.length === 0 || class_keys[0] === "null") {
+        // don't want to delete in the middle of a for loop
+        // so save the index to delete later
+        delete_these_features.push(zone_feature_index);
+      }
+    }
   });
+
+  if (delete_these_features.length > 0) {
+    if (zones.type === "Feature") {
+      zones = null;
+    } else if (zones.type === "FeatureCollection") {
+      zones.features = zones.features.filter((_, i) => !delete_these_features.includes(i));
+    }
+  }
+
   results.geojson = zones;
 
   return results;

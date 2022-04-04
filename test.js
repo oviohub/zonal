@@ -17,6 +17,7 @@ const nam_admin2 = loadJSON("./data/nam_admin2.json");
 const wind_buffers = loadJSON("./data/wld_nhr_adamtsbufferscurrent_wfp.geojson");
 const louisiana_parishes = loadJSON("./data/louisiana_parishes.geojson");
 const cone = loadJSON("./data/ida.geojson");
+const cone_120km = loadJSON("./data/ida_120.geojson");
 const caddo = loadJSON("./data/louisiana_parish_caddo.geojson");
 const concordia = loadJSON("./data/louisiana_parish_concordia.geojson");
 const vernon = loadJSON("./data/louisiana_parish_vernon.geojson");
@@ -325,4 +326,18 @@ test("percentage within range when using class property", ({ eq }) => {
       throw new Error("uh oh stat:percentage is greater than one");
     }
   });
+});
+
+test("delete zone features that don't overlap classes", ({ eq }) => {
+  const result = calculate({
+    zones: louisiana_parishes,
+    zone_properties: ["ParishName"],
+    classes: cone_120km,
+    class_properties: ["wind_speed"],
+    preserve_features: false,
+    remove_features_with_no_overlap: true
+  });
+  eq(louisiana_parishes.features.length > result.geojson.features.length, true);
+  eq(louisiana_parishes.features.length, 64);
+  eq(result.geojson.features.length, 22);
 });

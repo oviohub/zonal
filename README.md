@@ -36,6 +36,12 @@ const results = calculate({
   // delimiter used when serializing classes
   // with multiple properties to strings
   class_properties_delimiter: ","
+
+  // default is false
+  // deletes zonal features that have no overlap with the classes
+  // examples include districts not covered by a hurricane
+  // or cities that can't feel an earthquake
+  remove_features_with_no_overlap: true
 });
 ```
 result is the following object:
