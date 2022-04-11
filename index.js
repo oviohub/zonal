@@ -49,8 +49,18 @@ function getArrayKey({ feature, index, geometry, props }) {
   }
 }
 
-function unarray(arr) {
+function unarray (arr) {
   return arr.length === 1 ? arr[0] : arr;
+}
+
+// https://stackoverflow.com/questions/6122571/simple-non-secure-hash-function-for-javascript
+function hash (string) {
+  let hash = 0;
+  for (i = 0; i < string.length; i++) {
+    chr = string.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+  }
+  return hash;
 }
 
 // assumptions
@@ -68,7 +78,10 @@ function calculate({
   class_properties_delimiter = ",",
   preserve_features = true,
   remove_features_with_no_overlap = false,
-  debug_level = 0
+  on_before_each_zone_feature,
+  on_after_each_zone_feature,
+  feature_filter,
+  debug_level = 0,
 }) {
   if (!classes) throw new Error("[zonal] classes are missing or empty");
   if (!zones) throw new Error("[zonal] zones are missing or empty");
@@ -98,7 +111,6 @@ function calculate({
   if ([undefined, null].includes(class_properties)) {
     console.warn("[zonal] you didn't pass in class_properties, so defaulting to the class feature index number");
   }
-  
 
   // stats keyed by the unique zone+class combo id
   // e.g. { '["AK","Hot"]': 10, '["AK","Cold"]': 342 }
@@ -113,6 +125,7 @@ function calculate({
 
   // group class geometries into dictionary objects
   featureEach(classes, (class_feature, class_feature_index) => {
+
     geomEach(class_feature, (class_geometry, class_geometry_index) => {
       const class_array = getArrayKey({
         feature: class_feature,
@@ -133,14 +146,29 @@ function calculate({
         return;
       }
 
-      class_to_geometries[class_id] ??= [];
-      class_to_geometries[class_id].push(class_geometry);
+      const class_geometry_hash = hash(JSON.stringify(class_geometry.coordinates));
+
+      class_to_geometries[class_id] ??= {};
+      class_to_geometries[class_id][class_geometry_hash] = class_geometry;
     });
   });
 
   // zones must be one or more features with polygon geometries
   // like administrative districts
   featureEach(zones, (zone_feature, zone_feature_index) => {
+
+    if (feature_filter && feature_filter({ feature: zone_feature, index: zone_feature_index }) === false) {
+      return;
+    }
+
+    if (typeof on_before_each_zone_feature === "function") {
+      on_before_each_zone_feature({
+        feature: zone_feature,
+        feature_index: zone_feature_index,
+        stats,
+        zone_to_area
+      });
+    }
     geomEach(zone_feature, (zone_geometry, geometry_index) => {
       // sometimes the same zone could be split up amonst multiple features
       // for example, you could have a country with multiple islands
@@ -174,7 +202,7 @@ function calculate({
         const combo_id = JSON.stringify([zone_id, class_id]);
 
         let remaining_zone_geometry_for_specific_class = zone_geometry;
-        class_geometries.forEach(class_geometry => {
+        Object.values(class_geometries).forEach(class_geometry => {
           if (class_geometry_type === "Point") {
             stats[combo_id] ??= { count: 0 };
 
@@ -226,6 +254,14 @@ function calculate({
           : 0;
       }
     });
+    if (typeof on_after_each_zone_feature === "function") {
+      on_after_each_zone_feature({
+        feature: zone_feature,
+        feature_index: zone_feature_index,
+        stats,
+        zone_to_area
+      });
+    }
   });
 
   // calculate percentages
