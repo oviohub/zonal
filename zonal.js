@@ -20,6 +20,8 @@ var clone = require("@turf/clone")["default"];
 
 var difference = require("@turf/difference")["default"];
 
+var dissolve = require("@turf/dissolve")["default"];
+
 var booleanPointInPolygon = require("@turf/boolean-point-in-polygon")["default"];
 
 var _require = require("@turf/meta"),
@@ -117,6 +119,8 @@ function calculate(_ref2) {
       include_null_class_rows = _ref2$include_null_cl === void 0 ? true : _ref2$include_null_cl,
       _ref2$class_propertie = _ref2.class_properties_delimiter,
       class_properties_delimiter = _ref2$class_propertie === void 0 ? "," : _ref2$class_propertie,
+      _ref2$dissolve_classe = _ref2.dissolve_classes,
+      dissolve_classes = _ref2$dissolve_classe === void 0 ? false : _ref2$dissolve_classe,
       _ref2$preserve_featur = _ref2.preserve_features,
       preserve_features = _ref2$preserve_featur === void 0 ? true : _ref2$preserve_featur,
       _ref2$remove_features = _ref2.remove_features_with_no_overlap,
@@ -164,7 +168,14 @@ function calculate(_ref2) {
 
   var zone_to_area = {}; // { [class_id]: [<array of polygons or points>] }
 
-  var class_to_geometries = {}; // group class geometries into dictionary objects
+  var class_to_geometries = {};
+
+  if (Array.isArray(class_properties) && class_properties.length === 1 && dissolve_classes) {
+    classes = dissolve(classes, {
+      propertyName: class_properties[0]
+    });
+  } // group class geometries into dictionary objects
+
 
   featureEach(classes, function (class_feature, class_feature_index) {
     geomEach(class_feature, function (class_geometry, class_geometry_index) {

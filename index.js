@@ -1,6 +1,7 @@
 const calculateArea = require("@turf/area").default;
 const clone = require("@turf/clone").default;
 const difference = require("@turf/difference").default;
+const dissolve = require("@turf/dissolve").default;
 const booleanPointInPolygon = require("@turf/boolean-point-in-polygon").default;
 const { featureEach, geomEach } = require("@turf/meta");
 
@@ -49,16 +50,16 @@ function getArrayKey({ feature, index, geometry, props }) {
   }
 }
 
-function unarray (arr) {
+function unarray(arr) {
   return arr.length === 1 ? arr[0] : arr;
 }
 
 // https://stackoverflow.com/questions/6122571/simple-non-secure-hash-function-for-javascript
-function hash (string) {
+function hash(string) {
   let hash = 0;
   for (i = 0; i < string.length; i++) {
     chr = string.charCodeAt(i);
-    hash = ((hash << 5) - hash) + chr;
+    hash = (hash << 5) - hash + chr;
   }
   return hash;
 }
@@ -76,12 +77,13 @@ function calculate({
   include_zero_area = false,
   include_null_class_rows = true,
   class_properties_delimiter = ",",
+  dissolve_classes = false,
   preserve_features = true,
   remove_features_with_no_overlap = false,
   on_before_each_zone_feature,
   on_after_each_zone_feature,
   feature_filter,
-  debug_level = 0,
+  debug_level = 0
 }) {
   if (!classes) throw new Error("[zonal] classes are missing or empty");
   if (!zones) throw new Error("[zonal] zones are missing or empty");
@@ -101,7 +103,7 @@ function calculate({
   }
 
   if (preserve_features && remove_features_with_no_overlap) {
-    throw new Error("[zonal] you can't preserve features while also removing features that don't overlap classes")
+    throw new Error("[zonal] you can't preserve features while also removing features that don't overlap classes");
   }
 
   if ([undefined, null].includes(zone_properties)) {
@@ -123,9 +125,12 @@ function calculate({
   // { [class_id]: [<array of polygons or points>] }
   const class_to_geometries = {};
 
+  if (Array.isArray(class_properties) && class_properties.length === 1 && dissolve_classes) {
+    classes = dissolve(classes, { propertyName: class_properties[0] });
+  }
+
   // group class geometries into dictionary objects
   featureEach(classes, (class_feature, class_feature_index) => {
-
     geomEach(class_feature, (class_geometry, class_geometry_index) => {
       const class_array = getArrayKey({
         feature: class_feature,
@@ -156,7 +161,6 @@ function calculate({
   // zones must be one or more features with polygon geometries
   // like administrative districts
   featureEach(zones, (zone_feature, zone_feature_index) => {
-
     if (feature_filter && feature_filter({ feature: zone_feature, index: zone_feature_index }) === false) {
       return;
     }

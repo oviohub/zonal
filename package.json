@@ -14,7 +14,7 @@
     "babel": "./node_modules/.bin/babel index.js > zonal.js",
     "browserify": "npx browserify zonal.js > zonal.min.js",
     "build": "npm run babel && npm run browserify",
-    "format": "npx prettier --arrow-parens=avoid --print-width=120 --trailing-comma=none --write test.js zonal.js",
+    "format": "npx prettier --arrow-parens=avoid --print-width=120 --trailing-comma=none --write test.js index.js",
     "setup": "cd data && ./setup.sh",
     "test": "node test.js"
   },
@@ -48,6 +48,8 @@
     "@turf/boolean-point-in-polygon": "^6.5.0",
     "@turf/clone": "^6.5.0",
     "@turf/difference": "^6.5.0",
+    "@turf/dissolve": "^6.5.0",
+    "@turf/flatten": "^6.5.0",
     "papaparse": "^5.3.1"
   }
 }

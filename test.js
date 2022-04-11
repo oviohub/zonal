@@ -11,7 +11,7 @@ const loadJSON = fp => JSON.parse(fs.readFileSync(fp, "utf-8"));
 const earthquake_bufers = loadJSON("./data/earthquake_buffers.geojson");
 
 const indonesia_admin_boundaries = loadJSON("./data/admin_idn.json");
-
+const tjk_admin_boundaries_v2 = loadJSON("./data/tjk_admin_boundaries_v2.json");
 const mmr_admin1_boundaries = loadJSON("./data/mmr_admin1_boundaries.json");
 const nam_admin2 = loadJSON("./data/nam_admin2.json");
 const wind_buffers = loadJSON("./data/wld_nhr_adamtsbufferscurrent_wfp.geojson");
@@ -20,6 +20,7 @@ const cone = loadJSON("./data/ida.geojson");
 const cone_120km = loadJSON("./data/ida_120.geojson");
 const caddo = loadJSON("./data/louisiana_parish_caddo.geojson");
 const concordia = loadJSON("./data/louisiana_parish_concordia.geojson");
+const tjk_usgs_shakemaps_20210710 = loadJSON("./data/tjk_usgs_shakemaps_20210710.geojson");
 const vernon = loadJSON("./data/louisiana_parish_vernon.geojson");
 
 const tropical_storm_wind_buffers = loadJSON("./data/mmr_gdacs_buffers.geojson");
@@ -347,4 +348,18 @@ test("ignore parts of zones that don't overlap classes", ({ eq }) => {
     result.table.rows.every(row => row["stat:area"] > 0),
     true
   );
+});
+
+test("many class features", ({ eq }) => {
+  calculate({
+    zones: tjk_admin_boundaries_v2,
+    zone_properties: ["admin1Name_en"],
+    classes: tjk_usgs_shakemaps_20210710,
+    class_properties: ["label"],
+    remove_features_with_no_overlap: true,
+    preserve_features: false,
+    include_null_class_rows: false,
+    dissolve_classes: true,
+    debug_level: 1
+  });
 });
