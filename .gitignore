@@ -106,6 +106,7 @@ dist
 # Other files
 pnpm-lock.yaml
 .DS_Store
+.pnpm-store/
 *tmp*
 *bak*
 
