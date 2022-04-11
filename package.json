@@ -1,6 +1,6 @@
 {
   "name": "zonal",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Zonal Statistics",
   "main": "zonal.js",
   "unpkg": "zonal.min.js",
