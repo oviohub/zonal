@@ -1,3 +1,4 @@
+console.log("starting");
 const fs = require("fs");
 const papaparse = require("papaparse");
 const test = require("flug");
@@ -24,6 +25,7 @@ const tjk_usgs_shakemaps_20210710 = loadJSON("./data/tjk_usgs_shakemaps_20210710
 const vernon = loadJSON("./data/louisiana_parish_vernon.geojson");
 
 const tropical_storm_wind_buffers = loadJSON("./data/mmr_gdacs_buffers.geojson");
+console.log("loaded geojson");
 
 const windhoek = {
   type: "Feature",
@@ -42,14 +44,17 @@ function saveAsCSV(filepath, rows) {
 }
 
 test("earthquake buffers", ({ eq }) => {
+  console.log("starting earthquake buffers", indonesia_admin_boundaries.features.length);
   const results = calculate({
     debug_level: 2,
     zones: indonesia_admin_boundaries,
     zone_properties: ["A2NAME"],
     classes: earthquake_bufers,
     class_properties: ["mag"],
-    preserve_features: true
+    preserve_features: true,
+    on_before_each_zone_feature: ({ feature_index }) => console.log("feature_index:", feature_index)
   });
+  console.log("finished earthquake buffers");
   eq(results.table.columns, ["zone:A2NAME", "class:mag", "stat:area", "stat:percentage"]);
   const jayapura_rows = results.table.rows.filter(row => row["zone:A2NAME"] === "JAYAPURA");
 
@@ -350,16 +355,16 @@ test("ignore parts of zones that don't overlap classes", ({ eq }) => {
   );
 });
 
-test("many class features", ({ eq }) => {
-  calculate({
-    zones: tjk_admin_boundaries_v2,
-    zone_properties: ["admin1Name_en"],
-    classes: tjk_usgs_shakemaps_20210710,
-    class_properties: ["label"],
-    remove_features_with_no_overlap: true,
-    preserve_features: false,
-    include_null_class_rows: false,
-    dissolve_classes: true,
-    debug_level: 1
-  });
-});
+// test("many class features", ({ eq }) => {
+//   calculate({
+//     zones: tjk_admin_boundaries_v2,
+//     zone_properties: ["admin1Name_en"],
+//     classes: tjk_usgs_shakemaps_20210710,
+//     class_properties: ["label"],
+//     remove_features_with_no_overlap: true,
+//     preserve_features: false,
+//     include_null_class_rows: false,
+//     dissolve_classes: true,
+//     debug_level: 1
+//   });
+// });

@@ -57,7 +57,7 @@ function unarray(arr) {
 // https://stackoverflow.com/questions/6122571/simple-non-secure-hash-function-for-javascript
 function hash(string) {
   let hash = 0;
-  for (i = 0; i < string.length; i++) {
+  for (let i = 0; i < string.length; i++) {
     chr = string.charCodeAt(i);
     hash = (hash << 5) - hash + chr;
   }
@@ -127,6 +127,7 @@ function calculate({
 
   if (Array.isArray(class_properties) && class_properties.length === 1 && dissolve_classes) {
     classes = dissolve(classes, { propertyName: class_properties[0] });
+    if (debug_level >= 1) console.log("[zonal] dissolved classes");
   }
 
   // group class geometries into dictionary objects
@@ -157,6 +158,8 @@ function calculate({
       class_to_geometries[class_id][class_geometry_hash] = class_geometry;
     });
   });
+
+  if (debug_level >= 1) console.log("[zonal] grouped geometries by class");
 
   // zones must be one or more features with polygon geometries
   // like administrative districts

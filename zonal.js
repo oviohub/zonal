@@ -94,7 +94,7 @@ function unarray(arr) {
 function hash(string) {
   var hash = 0;
 
-  for (i = 0; i < string.length; i++) {
+  for (var i = 0; i < string.length; i++) {
     chr = string.charCodeAt(i);
     hash = (hash << 5) - hash + chr;
   }
@@ -174,6 +174,7 @@ function calculate(_ref2) {
     classes = dissolve(classes, {
       propertyName: class_properties[0]
     });
+    if (debug_level >= 1) console.log("[zonal] dissolved classes");
   } // group class geometries into dictionary objects
 
 
@@ -201,7 +202,8 @@ function calculate(_ref2) {
       (_class_to_geometries$ = class_to_geometries[class_id]) !== null && _class_to_geometries$ !== void 0 ? _class_to_geometries$ : class_to_geometries[class_id] = {};
       class_to_geometries[class_id][class_geometry_hash] = class_geometry;
     });
-  }); // zones must be one or more features with polygon geometries
+  });
+  if (debug_level >= 1) console.log("[zonal] grouped geometries by class"); // zones must be one or more features with polygon geometries
   // like administrative districts
 
   featureEach(zones, function (zone_feature, zone_feature_index) {
