@@ -95,7 +95,7 @@ function hash(string) {
   var hash = 0;
 
   for (var i = 0; i < string.length; i++) {
-    chr = string.charCodeAt(i);
+    var chr = string.charCodeAt(i);
     hash = (hash << 5) - hash + chr;
   }
 

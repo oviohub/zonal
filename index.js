@@ -58,7 +58,7 @@ function unarray(arr) {
 function hash(string) {
   let hash = 0;
   for (let i = 0; i < string.length; i++) {
-    chr = string.charCodeAt(i);
+    const chr = string.charCodeAt(i);
     hash = (hash << 5) - hash + chr;
   }
   return hash;
