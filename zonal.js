@@ -111,12 +111,6 @@ var shift = function shift() {
   return randSign() * Math.random() * 1e-7;
 };
 
-var range = function range(n) {
-  return new Array(n).fill(0).map(function (_, i) {
-    return i;
-  });
-};
-
 var shiftRing = function shiftRing(ring) {
   return ring.map(function (_ref2) {
     var _ref3 = _slicedToArray(_ref2, 2),
@@ -127,8 +121,13 @@ var shiftRing = function shiftRing(ring) {
   });
 };
 
-var shiftPolygon = rings.map(shiftRing);
-var shiftMultiPolygon = polygons.map(shiftPolygon);
+var shiftPolygon = function shiftPolygon(rings) {
+  return rings.map(shiftRing);
+};
+
+var shiftMultiPolygon = function shiftMultiPolygon(polygons) {
+  return polygons.map(shiftPolygon);
+};
 
 function shiftGeometry(geometry) {
   if (geometry.type === "Polygon") {

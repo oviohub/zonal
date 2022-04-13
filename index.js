@@ -67,10 +67,9 @@ function hash(string) {
 // randomly returns either 1 or -1
 const randSign = () => (Math.random() < 0.5 ? 1 : -1);
 const shift = () => randSign() * Math.random() * 1e-7;
-const range = n => new Array(n).fill(0).map((_, i) => i);
 const shiftRing = ring => ring.map(([x, y]) => [x + shift(), y + shift()]);
-const shiftPolygon = rings.map(shiftRing);
-const shiftMultiPolygon = polygons.map(shiftPolygon);
+const shiftPolygon = rings => rings.map(shiftRing);
+const shiftMultiPolygon = polygons => polygons.map(shiftPolygon);
 function shiftGeometry(geometry) {
   if (geometry.type === "Polygon") {
     geometry.coordinates = shiftPolygon(geometry.coordinates);
