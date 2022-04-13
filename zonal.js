@@ -100,36 +100,72 @@ function hash(string) {
   }
 
   return hash;
+} // randomly returns either 1 or -1
+
+
+var randSign = function randSign() {
+  return Math.random() < 0.5 ? 1 : -1;
+};
+
+var shift = function shift() {
+  return randSign() * Math.random() * 1e-7;
+};
+
+var range = function range(n) {
+  return new Array(n).fill(0).map(function (_, i) {
+    return i;
+  });
+};
+
+var shiftRing = function shiftRing(ring) {
+  return ring.map(function (_ref2) {
+    var _ref3 = _slicedToArray(_ref2, 2),
+        x = _ref3[0],
+        y = _ref3[1];
+
+    return [x + shift(), y + shift()];
+  });
+};
+
+var shiftPolygon = rings.map(shiftRing);
+var shiftMultiPolygon = polygons.map(shiftPolygon);
+
+function shiftGeometry(geometry) {
+  if (geometry.type === "Polygon") {
+    geometry.coordinates = shiftPolygon(geometry.coordinates);
+  } else if (geometry.type === "MultiPolygon") {
+    geometry.coordinates = shiftMultiPolygon(geometry.coordinates);
+  }
 } // assumptions
 // - zones is a GeoJSON with polygons
 // - classes are either all polygons/multi-polygons or all points (not mix of polygons and points)
 
 
-function calculate(_ref2) {
-  var zones = _ref2.zones,
-      zone_properties = _ref2.zone_properties,
-      classes = _ref2.classes,
-      class_properties = _ref2.class_properties,
-      class_geometry_type = _ref2.class_geometry_type,
-      _ref2$include_zero_co = _ref2.include_zero_count,
-      include_zero_count = _ref2$include_zero_co === void 0 ? false : _ref2$include_zero_co,
-      _ref2$include_zero_ar = _ref2.include_zero_area,
-      include_zero_area = _ref2$include_zero_ar === void 0 ? false : _ref2$include_zero_ar,
-      _ref2$include_null_cl = _ref2.include_null_class_rows,
-      include_null_class_rows = _ref2$include_null_cl === void 0 ? true : _ref2$include_null_cl,
-      _ref2$class_propertie = _ref2.class_properties_delimiter,
-      class_properties_delimiter = _ref2$class_propertie === void 0 ? "," : _ref2$class_propertie,
-      _ref2$dissolve_classe = _ref2.dissolve_classes,
-      dissolve_classes = _ref2$dissolve_classe === void 0 ? false : _ref2$dissolve_classe,
-      _ref2$preserve_featur = _ref2.preserve_features,
-      preserve_features = _ref2$preserve_featur === void 0 ? true : _ref2$preserve_featur,
-      _ref2$remove_features = _ref2.remove_features_with_no_overlap,
-      remove_features_with_no_overlap = _ref2$remove_features === void 0 ? false : _ref2$remove_features,
-      on_before_each_zone_feature = _ref2.on_before_each_zone_feature,
-      on_after_each_zone_feature = _ref2.on_after_each_zone_feature,
-      feature_filter = _ref2.feature_filter,
-      _ref2$debug_level = _ref2.debug_level,
-      debug_level = _ref2$debug_level === void 0 ? 0 : _ref2$debug_level;
+function calculate(_ref4) {
+  var zones = _ref4.zones,
+      zone_properties = _ref4.zone_properties,
+      classes = _ref4.classes,
+      class_properties = _ref4.class_properties,
+      class_geometry_type = _ref4.class_geometry_type,
+      _ref4$include_zero_co = _ref4.include_zero_count,
+      include_zero_count = _ref4$include_zero_co === void 0 ? false : _ref4$include_zero_co,
+      _ref4$include_zero_ar = _ref4.include_zero_area,
+      include_zero_area = _ref4$include_zero_ar === void 0 ? false : _ref4$include_zero_ar,
+      _ref4$include_null_cl = _ref4.include_null_class_rows,
+      include_null_class_rows = _ref4$include_null_cl === void 0 ? true : _ref4$include_null_cl,
+      _ref4$class_propertie = _ref4.class_properties_delimiter,
+      class_properties_delimiter = _ref4$class_propertie === void 0 ? "," : _ref4$class_propertie,
+      _ref4$dissolve_classe = _ref4.dissolve_classes,
+      dissolve_classes = _ref4$dissolve_classe === void 0 ? false : _ref4$dissolve_classe,
+      _ref4$preserve_featur = _ref4.preserve_features,
+      preserve_features = _ref4$preserve_featur === void 0 ? true : _ref4$preserve_featur,
+      _ref4$remove_features = _ref4.remove_features_with_no_overlap,
+      remove_features_with_no_overlap = _ref4$remove_features === void 0 ? false : _ref4$remove_features,
+      on_before_each_zone_feature = _ref4.on_before_each_zone_feature,
+      on_after_each_zone_feature = _ref4.on_after_each_zone_feature,
+      feature_filter = _ref4.feature_filter,
+      _ref4$debug_level = _ref4.debug_level,
+      debug_level = _ref4$debug_level === void 0 ? 0 : _ref4$debug_level;
   if (!classes) throw new Error("[zonal] classes are missing or empty");
   if (!zones) throw new Error("[zonal] zones are missing or empty");
 
@@ -247,10 +283,10 @@ function calculate(_ref2) {
       // you might want to know how much area is unaffected
 
       var remaining_zone_geometry_for_all_classes = zone_geometry;
-      entries(class_to_geometries).forEach(function (_ref3) {
-        var _ref4 = _slicedToArray(_ref3, 2),
-            class_id = _ref4[0],
-            class_geometries = _ref4[1];
+      entries(class_to_geometries).forEach(function (_ref5) {
+        var _ref6 = _slicedToArray(_ref5, 2),
+            class_id = _ref6[0],
+            class_geometries = _ref6[1];
 
         // unique identifier for the zone + class combo
         // there will be a row in the table for each zone + class combo
@@ -272,11 +308,19 @@ function calculate(_ref2) {
             }
           } else if (class_geometry_type === "Polygon") {
             if (remaining_zone_geometry_for_all_classes) {
-              remaining_zone_geometry_for_all_classes = difference(remaining_zone_geometry_for_all_classes, class_geometry);
+              try {
+                remaining_zone_geometry_for_all_classes = difference(remaining_zone_geometry_for_all_classes, class_geometry);
+              } catch (error) {
+                remaining_zone_geometry_for_all_classes = difference(remaining_zone_geometry_for_all_classes, shiftGeometry(clone(class_geometry)));
+              }
             }
 
             if (remaining_zone_geometry_for_specific_class) {
-              remaining_zone_geometry_for_specific_class = difference(remaining_zone_geometry_for_specific_class, class_geometry);
+              try {
+                remaining_zone_geometry_for_specific_class = difference(remaining_zone_geometry_for_specific_class, class_geometry);
+              } catch (error) {
+                remaining_zone_geometry_for_all_classes = difference(remaining_zone_geometry_for_specific_class, shiftGeometry(clone(class_geometry)));
+              }
             }
           }
         });
@@ -319,10 +363,10 @@ function calculate(_ref2) {
     }
   }); // calculate percentages
 
-  entries(stats).forEach(function (_ref5) {
-    var _ref6 = _slicedToArray(_ref5, 2),
-        combo_id = _ref6[0],
-        combo_stats = _ref6[1];
+  entries(stats).forEach(function (_ref7) {
+    var _ref8 = _slicedToArray(_ref7, 2),
+        combo_id = _ref8[0],
+        combo_stats = _ref8[1];
 
     var _JSON$parse = JSON.parse(combo_id),
         _JSON$parse2 = _slicedToArray(_JSON$parse, 2),
@@ -471,17 +515,17 @@ function calculate(_ref2) {
     var props = zone_feature.properties;
     var zone_id = JSON.stringify(props["zonal:zone_id"]);
     props["zonal:stat:area"] = Math.round(zone_to_area[zone_id]);
-    entries(agg_stats[zone_id]).forEach(function (_ref7) {
-      var _ref8 = _slicedToArray(_ref7, 2),
-          stat_name = _ref8[0],
-          stat_value = _ref8[1];
+    entries(agg_stats[zone_id]).forEach(function (_ref9) {
+      var _ref10 = _slicedToArray(_ref9, 2),
+          stat_name = _ref10[0],
+          stat_value = _ref10[1];
 
       props["zonal:stat:" + stat_name] = stat_value;
     });
-    props["zonal:stat:classes"] = entries(zone_id_to_stats[zone_id]).reduce(function (acc, _ref9) {
-      var _ref10 = _slicedToArray(_ref9, 2),
-          key = _ref10[0],
-          stats = _ref10[1];
+    props["zonal:stat:classes"] = entries(zone_id_to_stats[zone_id]).reduce(function (acc, _ref11) {
+      var _ref12 = _slicedToArray(_ref11, 2),
+          key = _ref12[0],
+          stats = _ref12[1];
 
       key = JSON.parse(key);
       key = Array.isArray(key) ? key.join(class_properties_delimiter) : key;

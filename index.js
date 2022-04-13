@@ -64,6 +64,21 @@ function hash(string) {
   return hash;
 }
 
+// randomly returns either 1 or -1
+const randSign = () => (Math.random() < 0.5 ? 1 : -1);
+const shift = () => randSign() * Math.random() * 1e-7;
+const range = n => new Array(n).fill(0).map((_, i) => i);
+const shiftRing = ring => ring.map(([x, y]) => [x + shift(), y + shift()]);
+const shiftPolygon = rings.map(shiftRing);
+const shiftMultiPolygon = polygons.map(shiftPolygon);
+function shiftGeometry(geometry) {
+  if (geometry.type === "Polygon") {
+    geometry.coordinates = shiftPolygon(geometry.coordinates);
+  } else if (geometry.type === "MultiPolygon") {
+    geometry.coordinates = shiftMultiPolygon(geometry.coordinates);
+  }
+}
+
 // assumptions
 // - zones is a GeoJSON with polygons
 // - classes are either all polygons/multi-polygons or all points (not mix of polygons and points)
@@ -221,16 +236,30 @@ function calculate({
             }
           } else if (class_geometry_type === "Polygon") {
             if (remaining_zone_geometry_for_all_classes) {
-              remaining_zone_geometry_for_all_classes = difference(
-                remaining_zone_geometry_for_all_classes,
-                class_geometry
-              );
+              try {
+                remaining_zone_geometry_for_all_classes = difference(
+                  remaining_zone_geometry_for_all_classes,
+                  class_geometry
+                );
+              } catch (error) {
+                remaining_zone_geometry_for_all_classes = difference(
+                  remaining_zone_geometry_for_all_classes,
+                  shiftGeometry(clone(class_geometry))
+                );
+              }
             }
             if (remaining_zone_geometry_for_specific_class) {
-              remaining_zone_geometry_for_specific_class = difference(
-                remaining_zone_geometry_for_specific_class,
-                class_geometry
-              );
+              try {
+                remaining_zone_geometry_for_specific_class = difference(
+                  remaining_zone_geometry_for_specific_class,
+                  class_geometry
+                );
+              } catch (error) {
+                remaining_zone_geometry_for_all_classes = difference(
+                  remaining_zone_geometry_for_specific_class,
+                  shiftGeometry(clone(class_geometry))
+                );
+              }
             }
           }
         });
