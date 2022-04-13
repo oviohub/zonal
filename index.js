@@ -70,12 +70,13 @@ const shift = () => randSign() * Math.random() * 1e-7;
 const shiftRing = ring => ring.map(([x, y]) => [x + shift(), y + shift()]);
 const shiftPolygon = rings => rings.map(shiftRing);
 const shiftMultiPolygon = polygons => polygons.map(shiftPolygon);
-function shiftGeometry(geometry) {
-  if (geometry.type === "Polygon") {
-    geometry.coordinates = shiftPolygon(geometry.coordinates);
-  } else if (geometry.type === "MultiPolygon") {
-    geometry.coordinates = shiftMultiPolygon(geometry.coordinates);
+function shiftGeometry(geom) {
+  if (geom.type === "Polygon") {
+    geom.coordinates = shiftPolygon(geom.coordinates);
+  } else if (geom.type === "MultiPolygon") {
+    geom.coordinates = shiftMultiPolygon(geom.coordinates);
   }
+  return geom;
 }
 
 // assumptions

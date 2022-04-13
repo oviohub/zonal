@@ -129,12 +129,14 @@ var shiftMultiPolygon = function shiftMultiPolygon(polygons) {
   return polygons.map(shiftPolygon);
 };
 
-function shiftGeometry(geometry) {
-  if (geometry.type === "Polygon") {
-    geometry.coordinates = shiftPolygon(geometry.coordinates);
-  } else if (geometry.type === "MultiPolygon") {
-    geometry.coordinates = shiftMultiPolygon(geometry.coordinates);
+function shiftGeometry(geom) {
+  if (geom.type === "Polygon") {
+    geom.coordinates = shiftPolygon(geom.coordinates);
+  } else if (geom.type === "MultiPolygon") {
+    geom.coordinates = shiftMultiPolygon(geom.coordinates);
   }
+
+  return geom;
 } // assumptions
 // - zones is a GeoJSON with polygons
 // - classes are either all polygons/multi-polygons or all points (not mix of polygons and points)
